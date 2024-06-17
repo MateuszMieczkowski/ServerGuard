@@ -21,7 +21,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\ServerGuard.Infrastructure\ServerGuard.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\ServerGuard.UseCases\ServerGuard.UseCases.csproj" />
-    <ProjectReference Include="..\..\src\ServerGuard.Web\ServerGuard.Web.csproj" />
   </ItemGroup>
 
 </Project>
