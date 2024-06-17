@@ -1,0 +1,17 @@
+{
+  "AgentOptions": {
+    "AgentId": "test",
+    "IsCpuEnabled": true,
+    "IsGpuEnabled": false,
+    "IsMemoryEnabled": true,
+    "IsMotherboardEnabled": false,
+    "IsControllerEnabled": false,
+    "IsNetworkEnabled": false,
+    "IsStorageEnabled": false,
+    "CollectEverySeconds": 10,
+    "RabbitUsername": "guest",
+    "RabbitPassword": "guest",
+    "RabbitUrl": "127.0.0.1",
+    "ApiKey": "XXXX"
+  }
+}
