@@ -2,8 +2,6 @@ using System.Reflection;
 using Ardalis.ListStartupServices;
 using Ardalis.SharedKernel;
 using ServerGuard.Infrastructure;
-using FastEndpoints;
-using FastEndpoints.Swagger;
 using MediatR;
 using Serilog;
 using Serilog.Extensions.Logging;
@@ -20,19 +18,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog((_, config) => config.ReadFrom.Configuration(builder.Configuration));
 var microsoftLogger = new SerilogLoggerFactory(logger)
     .CreateLogger<Program>();
-
-// Configure Web Behavior
-builder.Services.Configure<CookiePolicyOptions>(options =>
-{
-    options.CheckConsentNeeded = context => true;
-    options.MinimumSameSitePolicy = SameSiteMode.None;
-});
-
-builder.Services.AddFastEndpoints()
-                .SwaggerDocument(o =>
-                {
-                    o.ShortSchemaNames = true;
-                });
 
 ConfigureMediatR();
 
@@ -56,12 +41,8 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseDefaultExceptionHandler(); // from FastEndpoints
     app.UseHsts();
 }
-
-app.UseFastEndpoints()
-    .UseSwaggerGen(); // Includes AddFileServer and static files middleware
 
 app.UseHttpsRedirection();
 
@@ -91,7 +72,10 @@ static void SeedDatabase(WebApplication app)
 void ConfigureMediatR()
 {
     //TODO: Add assemblies to scan for handlers
-    var mediatRAssemblies = Array.Empty<Assembly>();
+    var mediatRAssemblies = new Assembly[]
+    {
+        Assembly.GetExecutingAssembly()
+    };
     builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(mediatRAssemblies!));
     builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
     builder.Services.AddScoped<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
