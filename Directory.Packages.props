@@ -37,8 +37,11 @@
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
     <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
     <PackageVersion Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.2" />
+    <PackageVersion Include="Npgsql" Version="8.0.3" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
     <PackageVersion Include="NSubstitute" Version="5.1.0" />
+    <PackageVersion Include="Quartz" Version="3.9.0" />
+    <PackageVersion Include="Quartz.Extensions.DependencyInjection" Version="3.9.0" />
     <PackageVersion Include="Quartz.Extensions.Hosting" Version="3.9.0" />
     <PackageVersion Include="RabbitMQ.Client" Version="6.8.1" />
     <PackageVersion Include="ReportGenerator" Version="5.3.6" />
