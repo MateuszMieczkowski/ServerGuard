@@ -26,6 +26,7 @@ builder.Services.AddInfrastructureServices(builder.Configuration, microsoftLogge
 if (builder.Environment.IsDevelopment())
 {
     AddShowAllServicesSupport();
+    builder.Services.AddDbMigrationJob();
 }
 else
 {
