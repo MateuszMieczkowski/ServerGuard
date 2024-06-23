@@ -1,6 +1,8 @@
 using System.Reflection;
 using Ardalis.SharedKernel;
 using Microsoft.EntityFrameworkCore;
+using ServerGuard.Core.Models.AgentAggregate;
+using ServerGuard.Core.Models.AgentMetricAggregate;
 
 namespace ServerGuard.Infrastructure.Data;
 public class AppDbContext : DbContext
@@ -13,6 +15,9 @@ public class AppDbContext : DbContext
     {
         _dispatcher = dispatcher;
     }
+
+    public DbSet<Agent> Agent { get; set; }
+    public DbSet<AgentMetric> AgentMetric { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
