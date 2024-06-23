@@ -1,14 +1,14 @@
 {
   "AgentOptions": {
-    "AgentId": "test",
+    "AgentId": "a9554fed-2634-4f60-a154-6a78c14bfb65",
     "IsCpuEnabled": true,
     "IsGpuEnabled": false,
     "IsMemoryEnabled": true,
     "IsMotherboardEnabled": false,
     "IsControllerEnabled": false,
-    "IsNetworkEnabled": false,
-    "IsStorageEnabled": false,
-    "CollectEverySeconds": 10,
+    "IsNetworkEnabled": true,
+    "IsStorageEnabled": true,
+    "CollectEverySeconds": 1,
     "RabbitUsername": "guest",
     "RabbitPassword": "guest",
     "RabbitUrl": "127.0.0.1",

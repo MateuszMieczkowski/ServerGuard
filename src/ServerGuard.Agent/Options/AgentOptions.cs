@@ -1,7 +1,7 @@
 namespace ServerGuard.Agent.Options;
 public class AgentOptions
 {
-    public string AgentId { get; set; } = default!; 
+    public Guid AgentId { get; set; } = default!; 
     public bool IsCpuEnabled { get; set; }
     public bool IsGpuEnabled { get; set; }
     public bool IsMemoryEnabled { get; set; }
