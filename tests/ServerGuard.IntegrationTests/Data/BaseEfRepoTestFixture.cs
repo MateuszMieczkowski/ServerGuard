@@ -34,6 +34,4 @@ public abstract class BaseEfRepoTestFixture
 
         return builder.Options;
     }
-
-
 }
