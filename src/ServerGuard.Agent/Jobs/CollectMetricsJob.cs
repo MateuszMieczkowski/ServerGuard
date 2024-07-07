@@ -1,6 +1,5 @@
 using MassTransit;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Quartz;
 using ServerGuard.Agent.Options;
 using ServerGuard.Agent.Services;
@@ -13,17 +12,17 @@ internal sealed class CollectMetricsJob : IJob
 {
     private readonly ILogger<CollectMetricsJob> _logger;
     private readonly IMetricCollector _metricCollector;
-    private readonly AgentOptions _options;
+    private readonly AgentConfig _agentConfig;
     private readonly IPublishEndpoint _publishEndpoint;
     public CollectMetricsJob(
         ILogger<CollectMetricsJob> logger,
         IMetricCollector metricCollector,
-        IOptions<AgentOptions> options,
+        AgentConfig agentConfig,
         IPublishEndpoint publishEndpoint)
     {
         _logger = logger;
         _metricCollector = metricCollector;
-        _options = options.Value;
+        _agentConfig = agentConfig;
         _publishEndpoint = publishEndpoint;
     }
 
@@ -32,7 +31,7 @@ internal sealed class CollectMetricsJob : IJob
         _logger.LogInformation("Collecting metrics...");
 
         var metrics = _metricCollector.Collect();
-        await _publishEndpoint.Publish(new MetricsCollected(Guid.NewGuid(), metrics), context.CancellationToken);
+        await _publishEndpoint.Publish(new MetricsCollected(_agentConfig.AgentId, metrics), context.CancellationToken);
 
         _logger.LogInformation("Metrics collected");
     }
