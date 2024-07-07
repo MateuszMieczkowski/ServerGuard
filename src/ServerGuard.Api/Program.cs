@@ -27,6 +27,7 @@ if (builder.Environment.IsDevelopment())
 {
     AddShowAllServicesSupport();
     builder.Services.AddDbMigrationJob();
+    builder.Services.AddSeedDbJob();
 }
 else
 {
