@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <Sdk Name="Microsoft.Build.CentralPackageVersions" Version="2.1.3" />
 
   <ItemGroup>
@@ -16,7 +16,6 @@
     <PackageReference Include="Quartz" />
     <PackageReference Include="Quartz.Extensions.DependencyInjection" />
     <PackageReference Include="Quartz.Extensions.Hosting" />
-    <PackageReference Include="SQLite" />
   </ItemGroup>
   
   <ItemGroup>

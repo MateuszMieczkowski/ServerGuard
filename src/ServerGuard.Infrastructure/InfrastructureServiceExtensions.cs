@@ -38,6 +38,20 @@ public static class InfrastructureServiceExtensions
         return services;
     }
 
+    public static IServiceCollection AddSeedDbJob(this IServiceCollection services)
+    {
+        services.AddQuartz(config =>
+        {
+            config.AddJob<SeedJob>(j => j.WithIdentity("SeedJob"));
+            config.AddTrigger(t => t
+                .ForJob("SeedJob")
+                .WithIdentity("SeedJobTrigger")
+                .StartAt(DateTime.UtcNow.AddSeconds(10)));
+        });
+
+        return services;
+    }
+
     private static void AddQuartz(IServiceCollection services)
     {
         services.AddQuartz();
