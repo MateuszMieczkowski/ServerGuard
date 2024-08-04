@@ -12,8 +12,8 @@ using ServerGuard.Infrastructure.Data;
 namespace ServerGuard.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240617202947_AgentMetric_HyperTable")]
-    partial class AgentMetric_HyperTable
+    [Migration("20240804192026_AddAgentTable")]
+    partial class AddAgentTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,31 +37,6 @@ namespace ServerGuard.Infrastructure.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Agent", (string)null);
-                });
-
-            modelBuilder.Entity("ServerGuard.Core.Models.AgentMetricAggregate.AgentMetric", b =>
-                {
-                    b.Property<Guid>("AgentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("HardwareName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
-
-                    b.Property<float?>("Value")
-                        .HasColumnType("real");
-
-                    b.HasKey("AgentId", "HardwareName", "Name", "Timestamp");
-
-                    b.ToTable("AgentMetric", (string)null);
                 });
 #pragma warning restore 612, 618
         }

@@ -22,4 +22,8 @@
     <ProjectReference Include="..\ServerGuard.Core\ServerGuard.Core.csproj" />
     <ProjectReference Include="..\ServerGuard.UseCases\ServerGuard.UseCases.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Data\Migrations\" />
+  </ItemGroup>
 </Project>
