@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 
 volumes/
+/src/ServerGuard.Worker/appsettings.Development.json
