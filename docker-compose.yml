@@ -10,12 +10,12 @@ services:
       RABBITMQ_DEFAULT_USER: "guest"
       RABBITMQ_DEFAULT_PASS: "guest"
 
-  serverguard.timescale:
-    image: timescale/timescaledb-ha:pg16
+  serverguard.postgres:
+    image: postgres:latest
     ports:
       - "5432:5432"
     volumes:
-    - ./timescale-data:/var/lib/postgresql/data
+    - ./volumes/postgres-data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "mysecretpassword"
@@ -26,7 +26,7 @@ services:
       dockerfile: src/ServerGuard.Api/Dockerfile
     depends_on:
       - serverguard.rabbtimq
-      - serverguard.timescale
+      - serverguard.postgres
 
   serverguard.worker:
       build:
@@ -34,4 +34,3 @@ services:
         dockerfile: src/ServerGuard.Worker/Dockerfile
       depends_on:
         - serverguard.rabbtimq
-        - serverguard.timescale

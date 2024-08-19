@@ -2,74 +2,72 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using Quartz;
 using ServerGuard.Agent.Jobs;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ServerGuard.Agent.Options;
 using ServerGuard.Agent.Services;
 using MassTransit;
+using ServerGuard.Agent.Config;
 
 var builder = Host.CreateApplicationBuilder();
 
 builder.Services.AddSerilog((_, config) => config.ReadFrom.Configuration(builder.Configuration));
 
-AddAgentOptions(builder);
-AddQuartz(builder);
+if (!RootChecker.IsRoot())
+{
+    var errMsg = "Agent must be run as root";
+    Console.WriteLine(errMsg);
+    Log.Fatal(errMsg);
+    return;
+}
+builder.Services.AddMemoryCache();
+AgentConfig agentConfig = await AddAgentConfigAsync(builder);
+AddQuartz(builder, agentConfig);
 AddServices(builder);
-AddMessageBroker(builder);
+AddMessageBroker(builder, agentConfig);
 
 var host = builder.Build();
 await host.RunAsync();
 
-static void AddMessageBroker(HostApplicationBuilder builder)
+static void AddMessageBroker(HostApplicationBuilder builder, AgentConfig agentConfig)
 {
-    var agentOptions = builder.Configuration.GetSection("AgentOptions").Get<AgentOptions>()!;
     builder.Services.AddMassTransit((config) =>
     {
         config.SetKebabCaseEndpointNameFormatter();
         config.UsingRabbitMq((context, cfg) =>
         {
-            cfg.Host(agentOptions.RabbitUrl, "/", cfg =>
+            cfg.Host(agentConfig.RabbitUrl, "/", cfg =>
             {
-                cfg.Username(agentOptions.RabbitUsername);
-                cfg.Password(agentOptions.RabbitPassword);
-                cfg.ConnectionName(agentOptions.AgentId);
-                //TODO: Add a custom connection factory
-                //cfg.OnRefreshConnectionFactory((_, factory) =>
-                //{
-                //    factory.HostName = agentOptions.RabbitUrl;
-                //    factory.UserName = agentOptions.RabbitUsername;
-                //    factory.Password = agentOptions.RabbitPassword;
-                //});
+                cfg.Username(agentConfig.RabbitUsername);
+                cfg.Password(agentConfig.RabbitPassword);
+                cfg.ConnectionName(agentConfig.AgentId.ToString());
             });
-
-            //cfg.Publish<MetricsCollectedEvent>(x =>
-            //{
-            //    x.Durable = true;
-            //    x.ExchangeType = ExchangeType.Topic;
-            //    x.BindQueue(agentOptions.RabbitExchange, agentOptions.Qiu);
-            //});
             cfg.ConfigureEndpoints(context);
         });
     });
 }
 
-static void AddQuartz(HostApplicationBuilder builder)
+static void AddQuartz(HostApplicationBuilder builder, AgentConfig agentConfig)
 {
     builder.Services.AddQuartz(config =>
     {
-        config.AddJob<CollectMetricsJob>(j => j.WithIdentity("CollectMetricsJob"));
+        config.AddJob<CollectMetricsJob>(j => j.WithIdentity(nameof(CollectMetricsJob)));
         config.AddTrigger(t => t
-            .ForJob("CollectMetricsJob")
-            .WithIdentity("CollectMetricsJobTrigger")
-            .WithSimpleSchedule(schedule => schedule.WithInterval(TimeSpan.FromSeconds(10)).RepeatForever()));
+            .ForJob(nameof(CollectMetricsJob))
+            .WithIdentity($"{nameof(CollectMetricsJob)}Trigger")
+            .WithSimpleSchedule(schedule => schedule.WithInterval(TimeSpan.FromSeconds(agentConfig.CollectEverySeconds)).RepeatForever()));
     });
     builder.Services.AddQuartzHostedService(config => config.WaitForJobsToComplete = true);
 }
 
-static void AddAgentOptions(HostApplicationBuilder builder)
+static async Task<AgentConfig> AddAgentConfigAsync(HostApplicationBuilder builder)
 {
-    builder.Configuration.AddJsonFile("agent.config.json", optional: false);
-    builder.Services.Configure<AgentOptions>(builder.Configuration.GetSection("AgentOptions"));
+    builder.Services.Configure<AgentConfigOptions>(builder.Configuration.GetSection("AgentConfig"));
+    builder.Services.AddSingleton<IAgentConfigProvider, FileAgentConfigProvider>();
+    var agentConfig = await builder.Services
+        .BuildServiceProvider()
+        .GetRequiredService<IAgentConfigProvider>()
+        .GetAsync(default);
+
+    return agentConfig;
 }
 
 static void AddServices(HostApplicationBuilder builder)

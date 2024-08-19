@@ -1,8 +1,5 @@
 using System.Reflection;
-using Ardalis.ListStartupServices;
-using Ardalis.SharedKernel;
 using ServerGuard.Infrastructure;
-using MediatR;
 using Serilog;
 using Serilog.Extensions.Logging;
 
@@ -25,7 +22,6 @@ builder.Services.AddInfrastructureServices(builder.Configuration, microsoftLogge
 
 if (builder.Environment.IsDevelopment())
 {
-    AddShowAllServicesSupport();
     builder.Services.AddDbMigrationJob();
     builder.Services.AddSeedDbJob();
 }
@@ -39,7 +35,6 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-    app.UseShowAllServicesMiddleware(); // see https://github.com/ardalis/AspNetCoreStartupServices
 }
 else
 {
@@ -79,20 +74,6 @@ void ConfigureMediatR()
         Assembly.GetExecutingAssembly()
     };
     builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(mediatRAssemblies!));
-    builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
-    builder.Services.AddScoped<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
-}
-
-void AddShowAllServicesSupport()
-{
-    // add list services for diagnostic purposes - see https://github.com/ardalis/AspNetCoreStartupServices
-    builder.Services.Configure<ServiceConfig>(config =>
-    {
-        config.Services = new List<ServiceDescriptor>(builder.Services);
-
-        // optional - default path to view services is /listallservices - recommended to choose your own path
-        config.Path = "/listservices";
-    });
 }
 
 // Make the implicit Program.cs class public, so integration tests can reference the correct assembly for host building

@@ -11,7 +11,11 @@ var builder = Host.CreateApplicationBuilder();
 
 builder.Services.AddSerilog((_, config) => config.ReadFrom.Configuration(builder.Configuration));
 
-if (builder.Configuration.GetValue<bool>("UseCosmos"))
+if (builder.Configuration.GetValue<bool>("UsePostgres"))
+{
+    builder.Services.AddScoped<IMetricRepository, PostgresMetricRepository>();
+}
+else if(builder.Configuration.GetValue<bool>("UseCosmos"))
 {
     var cosmosClientOptions = new CosmosClientOptions
     {
@@ -22,7 +26,7 @@ if (builder.Configuration.GetValue<bool>("UseCosmos"))
 }
 else
 {
-    builder.Services.AddScoped<IMetricRepository, PostgresMetricRepository>();
+    builder.Services.AddScoped<IMetricRepository, ClickHouseMetricRepository>();
 }
 
 AddMessageBroker(builder);

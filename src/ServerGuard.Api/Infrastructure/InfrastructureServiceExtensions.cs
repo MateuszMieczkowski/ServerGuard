@@ -1,9 +1,5 @@
-using Ardalis.GuardClauses;
 using ServerGuard.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Quartz;
 using ServerGuard.Infrastructure.Jobs;
 
@@ -16,7 +12,6 @@ public static class InfrastructureServiceExtensions
       ILogger logger)
     {
         string? connectionString = config.GetConnectionString("DefaultConnection");
-        Guard.Against.Null(connectionString);
         services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
         AddQuartz(services);
 

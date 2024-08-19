@@ -1,26 +1,35 @@
 using LibreHardwareMonitor.Hardware;
-using ServerGuard.Agent.Options;
+using ServerGuard.Agent.Config;
 using ServerGuard.Contracts.Dto;
 
 namespace ServerGuard.Agent.Services;
 
+internal interface IMetricCollector
+{
+    Metrics Collect();
+}
+
 internal sealed class MetricCollector : IMetricCollector
 {
-    private readonly AgentConfig _agentConfig;
+    private readonly IAgentConfigProvider _agentConfigProvider;
     private readonly Computer _computer;
-    public MetricCollector(AgentConfig agentConfig)
+    public MetricCollector(IAgentConfigProvider agentConfigProvider)
     {
-        _agentConfig = agentConfig;
+        var agentConfig = agentConfigProvider.GetAsync(default)
+            .GetAwaiter()
+            .GetResult();
+
         _computer = new Computer
         {
-            IsCpuEnabled = _agentConfig.IsCpuEnabled,
-            IsGpuEnabled = _agentConfig.IsGpuEnabled,
-            IsMemoryEnabled = _agentConfig.IsMemoryEnabled,
-            IsMotherboardEnabled = _agentConfig.IsMotherboardEnabled,
-            IsControllerEnabled = _agentConfig.IsControllerEnabled,
-            IsNetworkEnabled = _agentConfig.IsNetworkEnabled,
-            IsStorageEnabled = _agentConfig.IsStorageEnabled
+            IsCpuEnabled = agentConfig.IsCpuEnabled,
+            IsGpuEnabled = agentConfig.IsGpuEnabled,
+            IsMemoryEnabled = agentConfig.IsMemoryEnabled,
+            IsMotherboardEnabled = agentConfig.IsMotherboardEnabled,
+            IsControllerEnabled = agentConfig.IsControllerEnabled,
+            IsNetworkEnabled = agentConfig.IsNetworkEnabled,
+            IsStorageEnabled = agentConfig.IsStorageEnabled
         };
+        _agentConfigProvider = agentConfigProvider;
     }
 
     public Metrics Collect()

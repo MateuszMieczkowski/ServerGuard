@@ -1,17 +1,15 @@
 {
-  "AgentOptions": {
-    "AgentId": "a9554fed-2634-4f60-a154-6a78c14bfb65",
-    "IsCpuEnabled": true,
-    "IsGpuEnabled": false,
-    "IsMemoryEnabled": true,
-    "IsMotherboardEnabled": false,
-    "IsControllerEnabled": false,
-    "IsNetworkEnabled": true,
-    "IsStorageEnabled": true,
-    "CollectEverySeconds": 1,
-    "RabbitUsername": "guest",
-    "RabbitPassword": "guest",
-    "RabbitUrl": "127.0.0.1",
-    "ApiKey": "XXXX"
-  }
+  "AgentId": "10407f53-ef94-444d-be50-b4c67a584705",
+  "IsCpuEnabled": true,
+  "IsGpuEnabled": true,
+  "IsMemoryEnabled": true,
+  "IsMotherboardEnabled": true,
+  "IsControllerEnabled": true,
+  "IsNetworkEnabled": true,
+  "IsStorageEnabled": true,
+  "CollectEverySeconds": 1,
+  "RabbitUsername": "guest",
+  "RabbitPassword": "guest",
+  "RabbitUrl": "127.0.0.1",
+  "ApiKey": "XXXX"
 }
