@@ -1,0 +1,42 @@
+{
+  "groups": [
+    {
+      "name": "clickhouse",
+      "type": "com.mmieczkowski.serverguard.config.properties.ClickHouseProperties",
+      "sourceType": "com.mmieczkowski.serverguard.config.properties.ClickHouseProperties"
+    },
+    {
+      "name": "rsa",
+      "type": "com.mmieczkowski.serverguard.config.properties.RsaKeyProperties",
+      "sourceType": "com.mmieczkowski.serverguard.config.properties.RsaKeyProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "clickhouse.password",
+      "type": "java.lang.String",
+      "sourceType": "com.mmieczkowski.serverguard.config.properties.ClickHouseProperties"
+    },
+    {
+      "name": "clickhouse.url",
+      "type": "java.lang.String",
+      "sourceType": "com.mmieczkowski.serverguard.config.properties.ClickHouseProperties"
+    },
+    {
+      "name": "clickhouse.username",
+      "type": "java.lang.String",
+      "sourceType": "com.mmieczkowski.serverguard.config.properties.ClickHouseProperties"
+    },
+    {
+      "name": "rsa.private-key",
+      "type": "java.security.interfaces.RSAPrivateKey",
+      "sourceType": "com.mmieczkowski.serverguard.config.properties.RsaKeyProperties"
+    },
+    {
+      "name": "rsa.public-key",
+      "type": "java.security.interfaces.RSAPublicKey",
+      "sourceType": "com.mmieczkowski.serverguard.config.properties.RsaKeyProperties"
+    }
+  ],
+  "hints": []
+}

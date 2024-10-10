@@ -1,0 +1,13 @@
+{
+  "AgentId": "7ae3cbbe-0fdb-4804-a744-094ec21d8efe",
+  "IsCpuEnabled": true,
+  "IsGpuEnabled": true,
+  "IsMemoryEnabled": true,
+  "IsMotherboardEnabled": true,
+  "IsControllerEnabled": true,
+  "IsNetworkEnabled": true,
+  "IsStorageEnabled": true,
+  "CollectEverySeconds": 15,
+  "ApiKey": "RBU6M7U05L6YDLNKMFRR635URKJSSV3Z1R5BZ54R",
+  "ApiUrl": "http://localhost:8080"
+}
