@@ -1,19 +1,19 @@
-import React, { useState } from "react";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import Link from "@mui/material/Link";
-import Box from "@mui/material/Box";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import { Navigate, Link as RouterLink } from "react-router-dom";
-import { loginUser } from "../api/auth-service"; // Adjust the import path as necessary
-import { Alert, Snackbar } from "@mui/material";
+import { useState } from "react";
+import {
+  Container,
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+import { register } from "../api/auth-service";
+import { Navigate } from "react-router-dom";
 
-const SignInPage = () => {
-  const [loginSucces, setLoginSuccess] = useState<boolean | null>(null);
+const SignUpPage = () => {
   const [loading, setLoading] = useState(false);
+  const [signUpSuccess, setSignUpSuccess] = useState<boolean | null>(null);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -26,26 +26,48 @@ const SignInPage = () => {
     const data = new FormData(event.currentTarget);
     const email = data.get("email") as string;
     const password = data.get("password") as string;
-    const loginSuccess = await loginUser(email, password);
-    setLoginSuccess(loginSuccess);
-    if (!loginSuccess) {
+    const confirmPassword = data.get("confirmPassword") as string;
+    if (password !== confirmPassword) {
+      setSignUpSuccess(null);
       setSnackbar({
         open: true,
-        message: "Invalid credentials.",
+        message: "Passwords do not match",
         severity: "error",
       });
-    } else {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const registerSuccess = await register({ email, password });
+      setSignUpSuccess(registerSuccess);
+      if (!registerSuccess) {
+        setSnackbar({
+          open: true,
+          message: "Sign-up failed. Please try again.",
+          severity: "error",
+        });
+      } else {
+        setSnackbar({
+          open: true,
+          message: "Sign-up successful!",
+          severity: "success",
+        });
+      }
+    } catch (error) {
+      setSignUpSuccess(false);
       setSnackbar({
         open: true,
-        message: "Login successful!",
-        severity: "success",
+        message: "Sign-up failed. Please try again.",
+        severity: "error",
       });
+    } finally {
       setLoading(false);
     }
   };
 
-  if (loginSucces) {
-    return <Navigate to="/" />;
+  if (signUpSuccess === true) {
+    return <Navigate to="/sign-in" />;
   }
 
   return (
@@ -58,14 +80,12 @@ const SignInPage = () => {
           alignItems: "center",
         }}
       >
-        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-          <LockOutlinedIcon />
-        </Avatar>
         <Typography component="h1" variant="h5">
-          Sign in
+          Sign Up
         </Typography>
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
           <TextField
+            variant="outlined"
             margin="normal"
             required
             fullWidth
@@ -76,6 +96,7 @@ const SignInPage = () => {
             autoFocus
           />
           <TextField
+            variant="outlined"
             margin="normal"
             required
             fullWidth
@@ -85,24 +106,25 @@ const SignInPage = () => {
             id="password"
             autoComplete="current-password"
           />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            name="confirmPassword"
+            label="Confirm Password"
+            type="password"
+            id="confirmPassword"
+          />
           <Button
             type="submit"
             fullWidth
             variant="contained"
-            sx={{ mt: 3, mb: 2 }}
+            color="primary"
             disabled={loading}
           >
-            Sign In
+            Sign Up
           </Button>
-
-          <Box display="flex" justifyContent="space-between">
-            <Link component={RouterLink} to="/forgot-password" variant="body2">
-              Forgot password?
-            </Link>
-            <Link component={RouterLink} to="/sign-up" variant="body2">
-              {"Don't have an account? Sign Up"}
-            </Link>
-          </Box>
         </Box>
         <Snackbar
           open={snackbar.open}
@@ -123,4 +145,4 @@ const SignInPage = () => {
   );
 };
 
-export default SignInPage;
+export default SignUpPage;

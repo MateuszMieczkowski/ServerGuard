@@ -1,13 +1,8 @@
-import {
-  createTheme,
-  CssBaseline,
-  ThemeProvider,
-  Typography,
-} from "@mui/material";
+import { Typography } from "@mui/material";
 import { Navigate } from "react-router-dom";
 
 const RootPage = () => {
-  const isAuthenticated = false;
+  const isAuthenticated = localStorage.getItem("authToken") !== null;
   if (!isAuthenticated) {
     return <Navigate to="/sign-in" />;
   }

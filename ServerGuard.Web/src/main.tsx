@@ -10,6 +10,7 @@ import ErrorPage from "./Pages/error-page.tsx";
 import SignInPage from "./Pages/sign-in.tsx";
 import { ThemeProvider } from "@emotion/react";
 import { createTheme, CssBaseline } from "@mui/material";
+import SignUpPage from "./Pages/sign-up.tsx";
 
 const router = createBrowserRouter([
   {
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
   {
     path: "/sign-in",
     element: <SignInPage />,
+  },
+  {
+    path: "/sign-up",
+    element: <SignUpPage />,
   },
 ]);
 
