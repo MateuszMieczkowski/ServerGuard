@@ -435,3 +435,10 @@ buildNumber.properties
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
 
+secrets.yml
+
+**/target/
+
+**/resources/certs/
+ServerGuard.Api/.idea/** 
+ServerGuard.Api/src/main/resources/certs
