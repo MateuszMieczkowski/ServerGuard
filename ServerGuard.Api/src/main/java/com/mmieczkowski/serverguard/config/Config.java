@@ -3,11 +3,15 @@ package com.mmieczkowski.serverguard.config;
 import com.clickhouse.client.api.Client;
 import com.mmieczkowski.serverguard.config.properties.ClickHouseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import java.time.Clock;
+
+@EnableCaching
 @Configuration
 @EnableJpaAuditing
 @EnableTransactionManagement
@@ -28,5 +32,10 @@ public class Config {
                 .setSocketSndbuf(500_000)
                 .setClientNetworkBufferSize(500_000)
                 .build();
+    }
+
+    @Bean
+    public Clock clock() {
+        return Clock.systemUTC();
     }
 }

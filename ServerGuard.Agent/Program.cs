@@ -11,12 +11,12 @@ var builder = Host.CreateApplicationBuilder();
 
 builder.Services.AddSerilog((_, config) => config.ReadFrom.Configuration(builder.Configuration));
 
-//if (!RootChecker.IsRoot())
-//{
-//    var errMsg = "Agent must be run as root";
-//    Log.Fatal(errMsg);
-//    return;
-//}
+if (!RootChecker.IsRoot())
+{
+    var errMsg = "Agent must be run as root";
+    Log.Fatal(errMsg);
+    return;
+}
 builder.Services.AddMemoryCache();
 AgentConfig agentConfig = await AddAgentConfigAsync(builder);
 AddQuartz(builder, agentConfig);

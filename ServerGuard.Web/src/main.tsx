@@ -1,4 +1,4 @@
-import { StrictMode } from "react";
+import { StrictMode, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
@@ -11,12 +11,28 @@ import SignInPage from "./Pages/sign-in.tsx";
 import { ThemeProvider } from "@emotion/react";
 import { createTheme, CssBaseline } from "@mui/material";
 import SignUpPage from "./Pages/sign-up.tsx";
+import AgentsPage from "./Pages/agents-page.tsx";
+import DashboardsPage from "./Pages/dashboards-page.tsx";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import utc from "dayjs/plugin/utc";
+import dayjs from "dayjs";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <RootPage />,
     errorElement: <ErrorPage />,
+    children: [
+      {
+        path: "/resourceGroups/:resourceGroupId/agents",
+        element: <AgentsPage />,
+      },
+      {
+        path: "/resourceGroups/:resourceGroupId/agents/:agentId/dashboards",
+        element: <DashboardsPage />,
+      },
+    ],
   },
   {
     path: "/sign-in",
@@ -28,17 +44,21 @@ const router = createBrowserRouter([
   },
 ]);
 
-const darkTheme = createTheme({
+const theme = createTheme({
   palette: {
-    mode: "dark",
+    mode: "light",
   },
 });
 
+dayjs.extend(utc);
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
-      <RouterProvider router={router} />
-    </ThemeProvider>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <RouterProvider router={router} />
+      </ThemeProvider>
+    </LocalizationProvider>
   </StrictMode>
 );

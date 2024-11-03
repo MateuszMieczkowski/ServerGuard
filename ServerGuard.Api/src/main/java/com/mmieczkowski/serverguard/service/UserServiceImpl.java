@@ -1,13 +1,12 @@
 package com.mmieczkowski.serverguard.service;
 
-import com.mmieczkowski.serverguard.model.User;
-import com.mmieczkowski.serverguard.repository.UserRepository;
+import com.mmieczkowski.serverguard.user.User;
+import com.mmieczkowski.serverguard.user.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {

@@ -10,6 +10,7 @@ import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -55,7 +56,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger-ui", "/swagger-ui/**", "/error", "/v3/api-docs/**").permitAll()
                         .requestMatchers("api/auth/login", "api/auth/register").permitAll()
-                        .requestMatchers(("api/metrics")).permitAll()
+                        .requestMatchers(("api/resourceGroups/{resourceGroupId}/agents/{agentId}/metrics"), HttpMethod.POST.name()).permitAll()
                         .anyRequest().authenticated()
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))

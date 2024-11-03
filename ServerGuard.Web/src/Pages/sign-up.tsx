@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useFormik } from "formik";
 import {
   Container,
   Box,
@@ -10,6 +11,19 @@ import {
 } from "@mui/material";
 import { register } from "../api/auth-service";
 import { Navigate } from "react-router-dom";
+import * as yup from "yup";
+
+export const signUpSchema = yup.object().shape({
+  email: yup.string().email("Invalid email").required("Email is required"),
+  password: yup
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .required("Password is required"),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref("password"), undefined], "Passwords must match")
+    .required("Confirm Password is required"),
+});
 
 const SignUpPage = () => {
   const [loading, setLoading] = useState(false);
@@ -20,51 +34,55 @@ const SignUpPage = () => {
     severity: "success" as "success" | "error",
   });
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setLoading(true);
-    const data = new FormData(event.currentTarget);
-    const email = data.get("email") as string;
-    const password = data.get("password") as string;
-    const confirmPassword = data.get("confirmPassword") as string;
-    if (password !== confirmPassword) {
-      setSignUpSuccess(null);
-      setSnackbar({
-        open: true,
-        message: "Passwords do not match",
-        severity: "error",
-      });
-      setLoading(false);
-      return;
-    }
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+    validationSchema: signUpSchema,
+    onSubmit: async (values) => {
+      setLoading(true);
+      const { email, password, confirmPassword } = values;
+      if (password !== confirmPassword) {
+        setSignUpSuccess(null);
+        setSnackbar({
+          open: true,
+          message: "Passwords do not match",
+          severity: "error",
+        });
+        setLoading(false);
+        return;
+      }
 
-    try {
-      const registerSuccess = await register({ email, password });
-      setSignUpSuccess(registerSuccess);
-      if (!registerSuccess) {
+      try {
+        const registerSuccess = await register({ email, password });
+        setSignUpSuccess(registerSuccess);
+        if (!registerSuccess) {
+          setSnackbar({
+            open: true,
+            message: "Sign-up failed. Please try again.",
+            severity: "error",
+          });
+        } else {
+          setSnackbar({
+            open: true,
+            message: "Sign-up successful!",
+            severity: "success",
+          });
+        }
+      } catch (error) {
+        setSignUpSuccess(false);
         setSnackbar({
           open: true,
           message: "Sign-up failed. Please try again.",
           severity: "error",
         });
-      } else {
-        setSnackbar({
-          open: true,
-          message: "Sign-up successful!",
-          severity: "success",
-        });
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      setSignUpSuccess(false);
-      setSnackbar({
-        open: true,
-        message: "Sign-up failed. Please try again.",
-        severity: "error",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+  });
 
   if (signUpSuccess === true) {
     return <Navigate to="/sign-in" />;
@@ -83,7 +101,12 @@ const SignUpPage = () => {
         <Typography component="h1" variant="h5">
           Sign Up
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+        <Box
+          component="form"
+          onSubmit={formik.handleSubmit}
+          noValidate
+          sx={{ mt: 1 }}
+        >
           <TextField
             variant="outlined"
             margin="normal"
@@ -94,6 +117,11 @@ const SignUpPage = () => {
             name="email"
             autoComplete="email"
             autoFocus
+            value={formik.values.email}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.email && Boolean(formik.errors.email)}
+            helperText={formik.touched.email && formik.errors.email}
           />
           <TextField
             variant="outlined"
@@ -105,6 +133,11 @@ const SignUpPage = () => {
             type="password"
             id="password"
             autoComplete="current-password"
+            value={formik.values.password}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.password && Boolean(formik.errors.password)}
+            helperText={formik.touched.password && formik.errors.password}
           />
           <TextField
             variant="outlined"
@@ -115,6 +148,16 @@ const SignUpPage = () => {
             label="Confirm Password"
             type="password"
             id="confirmPassword"
+            value={formik.values.confirmPassword}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={
+              formik.touched.confirmPassword &&
+              Boolean(formik.errors.confirmPassword)
+            }
+            helperText={
+              formik.touched.confirmPassword && formik.errors.confirmPassword
+            }
           />
           <Button
             type="submit"

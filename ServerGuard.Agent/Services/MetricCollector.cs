@@ -33,6 +33,7 @@ internal sealed class MetricCollector : IMetricCollector
     {
         await UpdateComputerAsync(cancellationToken);
         _computer.Open();
+        _computer.Accept(new UpdateVisitor());
 
         List<SensorMetric> hardwareMetrics = [];
         foreach (IHardware hardware in _computer.Hardware)

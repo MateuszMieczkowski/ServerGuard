@@ -1,33 +1,30 @@
 import getConfig from "../config";
-
-interface LoginRequest {
-    email: string;
-    password: string;
-}
+import axios from 'axios';
 
 const config = getConfig();
 
-async function login(credentials: LoginRequest): Promise<string> {
-    const response = await fetch(`${config.apiUrl}/auth/login`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(credentials)
-    });
+async function login(credentials: { email: string; password: string }): Promise<string> {
+    try {
+        const response = await axios.post(`${config.apiUrl}/auth/login`, credentials, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
 
-    if (!response.ok) {
-        throw new Error('Login failed');
+        if (response.status !== 200) {
+            throw new Error('Login failed');
+        }
+
+        return response.data.token;
+    } catch (error) {
+        console.error('Login request failed:', error);
+        throw error;
     }
-
-    const data = await response.json();
-    const token = data.token;
-    return token;
 }
 
 export async function loginUser(email: string, password: string): Promise<boolean> {
     try {
-        const token = await login({ email: email, password });
+        const token = await login({ email, password });
         localStorage.setItem('authToken', token);
         return true;
     } catch (error) {
@@ -41,24 +38,21 @@ interface RegisterRequest {
     password: string;
 }
 
-export async function register(credentials: RegisterRequest): Promise<boolean> {
+export async function register(registerRequest: RegisterRequest): Promise<boolean> {
     try {
-        const response = await fetch(`${config.apiUrl}/auth/register`, {
-            method: 'POST',
+        const response = await axios.post(`${config.apiUrl}/auth/register`, registerRequest, {
             headers: {
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(credentials)
+            }
         });
 
-        if (!response.ok) {
+        if (response.status !== 200) {
             throw new Error('Registration failed');
         }
 
-        const data = await response.json();
-        return data.success;
+        return true;
     } catch (error) {
-        console.error('Registraion failed:', error);
+        console.error('Registration failed:', error);
         return false;
     }
 }

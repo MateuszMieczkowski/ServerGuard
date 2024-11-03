@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 namespace ServerGuard.Agent.Config;
 public class AgentConfig
 {
+    public Guid ResourceGroupId { get; private set; }
     public Guid AgentId { get; private set; }
     public bool IsCpuEnabled { get; private set; }
     public bool IsGpuEnabled { get; private set; }
@@ -21,6 +22,7 @@ public class AgentConfig
 
     [JsonConstructor]
     public AgentConfig(
+        Guid resourceGroupId,
         Guid agentId,
         bool isCpuEnabled,
         bool isGpuEnabled,
@@ -33,6 +35,7 @@ public class AgentConfig
         string apiKey,
         string apiUrl)
     {
+        ResourceGroupId = resourceGroupId;
         AgentId = agentId;
         IsCpuEnabled = isCpuEnabled;
         IsGpuEnabled = isGpuEnabled;
@@ -50,7 +53,8 @@ public class AgentConfig
     {
         if (obj is AgentConfig options)
         {
-            return AgentId == options.AgentId
+            return ResourceGroupId == options.ResourceGroupId
+                && AgentId == options.AgentId
                 && IsCpuEnabled == options.IsCpuEnabled
                 && IsGpuEnabled == options.IsGpuEnabled
                 && IsMemoryEnabled == options.IsMemoryEnabled

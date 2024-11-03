@@ -29,7 +29,7 @@ internal sealed class CollectMetricsJob : IJob
         _logger.LogInformation("Collecting metrics...");
         var agentConfig = await _agentConfigProvider.GetAsync(context.CancellationToken);
         var metrics = await _metricCollector.CollectAsync();
-        await _integrationApi.SendMetrics(agentConfig.ApiKey, metrics, context.CancellationToken);
+        await _integrationApi.SendMetrics(agentConfig.ApiKey, agentConfig.ResourceGroupId, agentConfig.AgentId, metrics, context.CancellationToken);
         _logger.LogInformation("Metrics collected");
     }
 }

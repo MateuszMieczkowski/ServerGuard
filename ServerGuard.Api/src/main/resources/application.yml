@@ -17,6 +17,10 @@ spring:
       accept-case-insensitive-enums: true
   config:
     import: optional:secrets.yml
+  threads:
+    virtual:
+      enabled: true
+
 
 rsa:
   private-key: classpath:certs/private.pem
@@ -26,3 +30,7 @@ clickhouse:
   password: mysecretpassword
   username: default
   url: http://localhost:8123/default
+
+logging:
+  level:
+    clickhouse: DEBUG
