@@ -3,22 +3,15 @@ package com.mmieczkowski.serverguard.agent;
 import com.mmieczkowski.serverguard.agent.request.CreateAgentRequest;
 import com.mmieczkowski.serverguard.agent.response.CreateAgentResponse;
 import com.mmieczkowski.serverguard.agent.request.GetAgentRequest;
+import com.mmieczkowski.serverguard.agent.response.GetAgentConfigResponse;
 import com.mmieczkowski.serverguard.agent.response.GetAgentResponse;
-import com.mmieczkowski.serverguard.metric.response.GetAvailableMetricsResponse;
 import com.mmieczkowski.serverguard.agent.request.GetAgentsPaginatedRequest;
 import com.mmieczkowski.serverguard.agent.response.GetAgentsPaginatedResponse;
 import com.mmieczkowski.serverguard.agent.request.UpdateAgentRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.UUID;
 
 @RestController
@@ -50,16 +43,8 @@ public class AgentController {
         return agentService.getAgentsPaginated(resourceGroupId, request);
     }
 
-    @GetMapping("/{agentId}/config")
-    public ResponseEntity<InputStreamResource> getAgentConfigFile(@PathVariable UUID resourceGroupId, @PathVariable UUID agentId) {
-        byte[] bytes = agentService.getAgentConfigFileAsJson(resourceGroupId, agentId);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=agent.config.json");
-        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        InputStream inputStream = new ByteArrayInputStream(bytes);
-        InputStreamResource resource = new InputStreamResource(inputStream);
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(resource);
+    @DeleteMapping("/{agentId}")
+    public void deleteAgent(@PathVariable UUID resourceGroupId, @PathVariable UUID agentId) {
+        agentService.deleteAgent(resourceGroupId, agentId);
     }
 }

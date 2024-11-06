@@ -99,3 +99,34 @@ export const createDashboard = async (resourceGroupId: string, agentId: string, 
         throw error;
     }
 }
+
+export const deleteDashboard = async (resourceGroupId: string, agentId: string, dashboardId: string) => {
+    try {
+        const response = await axiosInstance.delete(`${config.apiUrl}/resourceGroups/${resourceGroupId}/agents/${agentId}/dashboards/${dashboardId}`);
+
+        if (response.status !== 200) {
+            throw new Error('Failed to delete dashboard');
+        }
+    } catch (error) {
+        console.error("Failed to delete dashboard", error);
+        throw error;
+    }
+}
+
+export const updateDashboard = async (resourceGroupId: string, agentId: string, dashboardId: string, request: CreateDashboardRequest) => {
+    try {
+        const response = await axiosInstance.put(`${config.apiUrl}/resourceGroups/${resourceGroupId}/agents/${agentId}/dashboards/${dashboardId}`, request, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.status !== 200) {
+            throw new Error('Failed to update dashboard');
+        }
+        return;
+    } catch (error) {
+        console.error("Failed to update dashboard", error);
+        throw error;
+    }
+}

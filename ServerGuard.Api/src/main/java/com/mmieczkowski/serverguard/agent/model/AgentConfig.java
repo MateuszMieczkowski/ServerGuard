@@ -3,11 +3,13 @@ package com.mmieczkowski.serverguard.agent.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 
 @Data
 @Embeddable
+@EqualsAndHashCode
 public class AgentConfig implements Serializable {
 
     public AgentConfig(boolean isCpuEnabled,
@@ -52,9 +54,9 @@ public class AgentConfig implements Serializable {
     @Column(nullable = false)
     private boolean isStorageEnabled;
 
-    @Column(nullable = false, columnDefinition = "integer default 15")
+    @Column(nullable = false)
     private int collectEverySeconds;
 
-    @Column(nullable = true)
+    @Column
     private String apiKey;
 }

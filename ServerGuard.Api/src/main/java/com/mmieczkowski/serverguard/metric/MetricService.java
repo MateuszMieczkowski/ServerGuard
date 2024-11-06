@@ -86,7 +86,7 @@ public class MetricService {
                             .map(metricEntry -> new GetAvailableMetricsResponse.Sensor.Metric(
                                     metricEntry.getKey(),
                                     metricEntry.getValue().stream()
-                                            .map(x -> MetricType.values()[x - 1])
+                                            .map(x -> new GetAvailableMetricsResponse.Sensor.Metric.MetricType(MetricType.values()[x - 1].name(), MetricType.values()[x - 1].getUnit())  )
                                             .collect(Collectors.toList())
                             ))
                             .collect(Collectors.toList());

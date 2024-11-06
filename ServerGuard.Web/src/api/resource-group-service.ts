@@ -4,7 +4,7 @@ import axiosInstance from "./axios-instance";
 const config = getConfig();
 
 
-const createResourceGroup = async (name: string) =>{
+export const createResourceGroup = async (name: string) =>{
     try {
         const response = await axiosInstance.post(`${config.apiUrl}/resourceGroups`, {name}, {
             headers: {
@@ -33,7 +33,7 @@ export interface GetResourceGroupsResponse {
     totalPages: number;
 }
 
-const getResourceGroups = async (pageNumber: number, pageSize: number) : Promise<GetResourceGroupsResponse> => {
+export const getResourceGroups = async (pageNumber: number, pageSize: number) : Promise<GetResourceGroupsResponse> => {
     try {
         const response = await axiosInstance.get(`${config.apiUrl}/resourceGroups?pageNumber=${pageNumber}&pageSize=${pageSize}`,);
 
@@ -48,7 +48,7 @@ const getResourceGroups = async (pageNumber: number, pageSize: number) : Promise
     }
 }
 
-const getResourceGroup = async (resourceGroupId: string) : Promise<ResourceGroup> => {
+export const getResourceGroup = async (resourceGroupId: string) : Promise<ResourceGroup> => {
     try {
         const response = await axiosInstance.get(`${config.apiUrl}/resourceGroups/${resourceGroupId}`,);
 
@@ -63,5 +63,20 @@ const getResourceGroup = async (resourceGroupId: string) : Promise<ResourceGroup
     }
 }
 
+export const updateResourceGroup = async (resourceGroupId: string, name: string) => {
+    try {
+        const response = await axiosInstance.put(`${config.apiUrl}/resourceGroups/${resourceGroupId}`, {name}, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
 
-export { createResourceGroup, getResourceGroups, getResourceGroup };
+        if (response.status !== 200) {
+            throw new Error('Failed to update resource group');
+        }
+        return;
+    } catch (error) {
+        console.error("Failed to update resource group", error);
+        throw error;
+    }
+}

@@ -31,6 +31,12 @@ clickhouse:
   username: default
   url: http://localhost:8123/default
 
+smtp:
+  host: smtp.gmail.com
+  port: 587
+  username: xxx
+  password: xxx
+
 logging:
   level:
     clickhouse: DEBUG

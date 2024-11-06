@@ -19,7 +19,7 @@ import {
   Snackbar,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import { createDashboard, Graph } from "../api/dashboards-service";
+import { createDashboard, Dashboard, Graph } from "../api/dashboards-service";
 import {
   getAgentAvailableMetrics,
   GetAgentAvailableMetricsResponse,
@@ -92,6 +92,7 @@ export const CreateDashboardDialog: React.FC<CreateDashboardDialogProps> = ({
         metricType: "",
         index: graphs.length,
         lineColor: "",
+        unit: "",
       },
     ]);
   };
@@ -176,7 +177,7 @@ export const CreateDashboardDialog: React.FC<CreateDashboardDialogProps> = ({
           component: "form",
         }}
       >
-        <DialogTitle width={200}>New dashboard</DialogTitle>
+        <DialogTitle width={200}>New Dashboard</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -275,7 +276,9 @@ export const CreateDashboardDialog: React.FC<CreateDashboardDialogProps> = ({
                           (metric) => metric.name == graph.metricName
                         )
                         ?.types?.map((metricType) => (
-                          <MenuItem value={metricType}>{metricType}</MenuItem>
+                          <MenuItem value={metricType.name}>
+                            {metricType.name}
+                          </MenuItem>
                         ))}
                     </Select>
                   </FormControl>

@@ -41,12 +41,41 @@ internal sealed class MetricCollector : IMetricCollector
             var metrics = new List<Metric>();
             foreach (ISensor sensor in hardware.Sensors)
             {
+                var metricType = Enum.Parse<MetricType>(sensor.SensorType.ToString());
+                var value = sensor.Value;
+
+                if (IsInvalidMetric(metricType, value))
+                {
+                    continue;
+                }
                 metrics.Add(new Metric(sensor.Name, sensor.Value, Enum.Parse<MetricType>(sensor.SensorType.ToString())));
             }
             hardwareMetrics.Add(new SensorMetric(hardware.Name, metrics));
         }
         _computer.Close();
         return new Metrics(DateTime.UtcNow, hardwareMetrics);
+    }
+
+    private static bool IsInvalidMetric(MetricType metricType, float? value)
+    {
+        return (metricType == MetricType.Load && (value < 0 || value > 100)) ||
+                            (metricType == MetricType.Temperature && (value < -50 || value > 200)) ||
+                            (metricType == MetricType.Voltage && (value < 0 || value > 15)) ||
+                            (metricType == MetricType.Clock && (value < 0 || value > 6000)) ||
+                            (metricType == MetricType.Fan && (value < 0 || value > 10000)) ||
+                            (metricType == MetricType.Flow && (value < 0 || value > 100)) ||
+                            (metricType == MetricType.Control && (value < 0 || value > 100)) ||
+                            (metricType == MetricType.Level && (value < 0 || value > 100)) ||
+                            (metricType == MetricType.Factor && (value < 0 || value > 10)) ||
+                            (metricType == MetricType.Power && (value < 0 || value > 1000)) ||
+                            (metricType == MetricType.Data && (value < 0)) ||
+                            (metricType == MetricType.SmallData && (value < 0)) ||
+                            (metricType == MetricType.Throughput && (value < 0)) ||
+                            (metricType == MetricType.Current && (value < 0)) ||
+                            (metricType == MetricType.Frequency && (value < 0)) ||
+                            (metricType == MetricType.TimeSpan && (value < 0)) ||
+                            (metricType == MetricType.Energy && (value < 0)) ||
+                            (metricType == MetricType.Noise && (value < 0));
     }
 
     private async Task UpdateComputerAsync(CancellationToken cancellationToken)

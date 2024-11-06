@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -71,18 +72,19 @@ public class ClickHouseMetricRepository implements MetricRepository {
                                                     LocalDateTime to,
                                                     int maxDataPoints) {
         String query =
-                "SELECT untuple(x)\n" +
-                "FROM (SELECT lttb({maxDataPoints:UInt64})(time, value) dataPoints\n" +
-                "      FROM (SELECT m.time, m.value\n" +
-                "            FROM metric m\n" +
-                "            WHERE agent_id = {agentId:String}\n" +
-                "              AND m.sensor_name = {sensorName:String}\n" +
-                "              AND m.metric_name = {metricName:String}\n" +
-                "              AND m.type = {metricType:Int32}\n" +
-                "              AND m.time >= {from:DateTime}\n" +
-                "              AND m.time <= {to:DateTime}\n" +
-                "            order by time))\n" +
-                "ARRAY JOIN dataPoints as x;";
+                """
+                        SELECT untuple(x)
+                        FROM (SELECT lttb({maxDataPoints:UInt64})(time, value) dataPoints
+                              FROM (SELECT m.time, m.value
+                                    FROM metric m
+                                    WHERE agent_id = {agentId:String}
+                                      AND m.sensor_name = {sensorName:String}
+                                      AND m.metric_name = {metricName:String}
+                                      AND m.type = {metricType:Int32}
+                                      AND m.time >= {from:DateTime}
+                                      AND m.time <= {to:DateTime}
+                                    order by time))
+                        ARRAY JOIN dataPoints as x;""";
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put("maxDataPoints", maxDataPoints);
         queryParams.put("agentId", agentId.toString());
@@ -119,17 +121,18 @@ public class ClickHouseMetricRepository implements MetricRepository {
                                                 LocalDateTime to,
                                                 int intervalMinutes) {
         String query =
-                "SELECT toStartOfInterval(time, INTERVAL {intervalMinutes:Int32} minute) AS interval,\n" +
-                        "       avg(value) AS avg_value\n" +
-                        "FROM metric m\n" +
-                        "WHERE agent_id = {agentId:String}\n" +
-                        "  AND m.sensor_name = {sensorName:String}\n" +
-                        "  AND m.metric_name = {metricName:String}\n" +
-                        "  AND m.type = {metricType:Int32}\n" +
-                        "  AND m.time >= {from:DateTime}\n" +
-                        "  AND m.time <= {to:DateTime}\n" +
-                        "GROUP BY interval\n" +
-                        "             ORDER BY interval;";
+                """
+                        SELECT toStartOfInterval(time, INTERVAL {intervalMinutes:Int32} minute) AS interval,
+                               avg(value) AS avg_value
+                        FROM metric m
+                        WHERE agent_id = {agentId:String}
+                          AND m.sensor_name = {sensorName:String}
+                          AND m.metric_name = {metricName:String}
+                          AND m.type = {metricType:Int32}
+                          AND m.time >= {from:DateTime}
+                          AND m.time <= {to:DateTime}
+                        GROUP BY interval
+                                     ORDER BY interval;""";
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put("intervalMinutes", intervalMinutes);
         queryParams.put("agentId", agentId.toString());
@@ -151,6 +154,42 @@ public class ClickHouseMetricRepository implements MetricRepository {
                 dataPoints.add(dataPoint);
             }
             return dataPoints;
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public double findLastMetricValueByAgentId(UUID agentId,
+                                              String sensorName,
+                                              String metricName,
+                                              MetricType metricType,
+                                              Duration fromNow,
+                                              String aggregateFunction) {
+        String query = """
+                select %s(m.value) from metric m
+                where m.agent_id = {agentId:String}
+                  AND m.sensor_name =  {sensorName:String}
+                  AND m.metric_name = {metricName:String}
+                  AND m.type = {metricType:Int32}
+                  AND m.time > now() - {secondsFromNow:Int64};""";
+        query = String.format(query, aggregateFunction);
+
+        Map<String, Object> queryParams = new HashMap<>();
+        queryParams.put("secondsFromNow", fromNow.getSeconds());
+        queryParams.put("agentId", agentId.toString());
+        queryParams.put("sensorName", sensorName);
+        queryParams.put("metricName", metricName);
+        queryParams.put("metricType", metricType.getValue());
+        CompletableFuture<QueryResponse> responseCompletableFuture = client.query(query, queryParams, new QuerySettings());
+        try(QueryResponse queryResponse = responseCompletableFuture.get(3, TimeUnit.SECONDS)) {
+            if(queryResponse.getResultRows() == 0) {
+                return 0;
+            }
+            ClickHouseBinaryFormatReader reader = Client.newBinaryFormatReader(queryResponse);
+            reader.next();
+            return reader.getDouble(1);
 
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -6,6 +6,7 @@ import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.util.Assert;
 
 import java.time.Instant;
 import java.util.List;
@@ -35,10 +36,16 @@ public class ResourceGroup {
     private List<UserResourceGroupPermission> userResourceGroupPermissions;
 
     @Column(nullable = false)
-    private boolean isDeleted = false;
+    private final boolean isDeleted = false;
 
     public ResourceGroup() {}
     public ResourceGroup(String name) {
+        this.name = name;
+    }
+
+    public void setName(String name) {
+        Assert.notNull(name, "Name cannot be null");
+        Assert.isTrue(!name.isBlank(), "Name cannot be blank");
         this.name = name;
     }
 }

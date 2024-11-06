@@ -16,7 +16,9 @@ import com.mmieczkowski.serverguard.resourcegroup.exception.ResourceGroupNotFoun
 import com.mmieczkowski.serverguard.agent.model.Agent;
 import com.mmieczkowski.serverguard.agent.AgentRepository;
 import com.mmieczkowski.serverguard.service.UserService;
+import com.mmieczkowski.serverguard.user.User;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,11 +55,7 @@ public class DashboardService {
     }
 
     public GetDashboardResponse getDashboard(UUID resourceGroupId, UUID agentId, UUID dashboardId) {
-        var user = userService.getLoggedInUser()
-                .orElseThrow();
-        if(!user.hasAccessToResourceGroup(resourceGroupId)) {
-            throw new ResourceGroupNotFoundException(resourceGroupId);
-        }
+        var user = getUserOrThrow(resourceGroupId);
         Agent agent = agentRepository.findAgentByIdAndUserId(agentId, user.getId())
                 .orElseThrow(AgentNotFoundException::new);
         Dashboard dashboard = dashboardRepository.findById(dashboardId)
@@ -76,11 +74,7 @@ public class DashboardService {
     }
 
     public GetDashboardsResponse getDashboards(UUID resourceGroupId, UUID agentId) {
-        var user = userService.getLoggedInUser()
-                .orElseThrow();
-        if(!user.hasAccessToResourceGroup(resourceGroupId)) {
-            throw new ResourceGroupNotFoundException(resourceGroupId);
-        }
+        var user = getUserOrThrow(resourceGroupId);
         Agent agent = agentRepository.findAgentByIdAndUserId(agentId, user.getId())
                 .orElseThrow(AgentNotFoundException::new);
         var dashboards = dashboardRepository.findAllByAgentId(agentId, Sort.by("name")).stream()
@@ -91,11 +85,7 @@ public class DashboardService {
     }
 
     public GetGraphDataResponse getGraphData(UUID resourceGroupId, UUID agentId, UUID dashboardId, int graphIndex, GetGraphDataRequest request) {
-        var user = userService.getLoggedInUser()
-                .orElseThrow();
-        if(!user.hasAccessToResourceGroup(resourceGroupId)) {
-            throw new ResourceGroupNotFoundException(resourceGroupId);
-        }
+        var user = getUserOrThrow(resourceGroupId);
         Agent agent = agentRepository.findAgentByIdAndUserId(agentId, user.getId())
                 .orElseThrow(AgentNotFoundException::new);
         Dashboard dashboard = dashboardRepository.findById(dashboardId)
@@ -127,5 +117,40 @@ public class DashboardService {
                     intervalMinutes);
             return new GetGraphDataResponse(dataPoints);
         }
+    }
+
+    @NotNull
+    private User getUserOrThrow(UUID resourceGroupId) {
+        var user = userService.getLoggedInUser()
+                .orElseThrow();
+        if(!user.hasAccessToResourceGroup(resourceGroupId)) {
+            throw new ResourceGroupNotFoundException(resourceGroupId);
+        }
+        return user;
+    }
+
+    public void deleteDashboard(UUID resourceGroupId, UUID agentId, UUID dashboardId) {
+        var user = getUserOrThrow(resourceGroupId);
+        agentRepository.findAgentByIdAndUserId(agentId, user.getId())
+                .orElseThrow(AgentNotFoundException::new);
+        var dashboardOptional = dashboardRepository.findById(dashboardId);
+        if(dashboardOptional.isEmpty()) {
+            return;
+        }
+        dashboardRepository.delete(dashboardOptional.get());
+    }
+
+    public void updateDashboard(UUID resourceGroupId, UUID agentId, UUID dashboardId, CreateDashboardRequest request) {
+        var user = getUserOrThrow(resourceGroupId);
+        Agent agent = agentRepository.findAgentByIdAndUserId(agentId, user.getId())
+                .orElseThrow(AgentNotFoundException::new);
+        Dashboard dashboard = dashboardRepository.findById(dashboardId)
+                .orElseThrow(DashboardNotFoundException::new);
+        dashboard.setName(request.name());
+        dashboard.clearGraphs();
+        for(var graph : request.graphs()) {
+            dashboard.addGraph(new Graph(graph.index(), graph.sensorName(), graph.metricName(), graph.metricType(), graph.lineColor()));
+        }
+        dashboardRepository.saveAndFlush(dashboard);
     }
 }

@@ -16,7 +16,11 @@ import DashboardsPage from "./Pages/dashboards-page.tsx";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import utc from "dayjs/plugin/utc";
+import duration from "dayjs/plugin/duration";
+import relativeTime from "dayjs/plugin/relativeTime";
 import dayjs from "dayjs";
+import { ResourceGroupSettingsPage } from "./Pages/resource-group-settings.tsx";
+import { AlertsPage } from "./Pages/alerts-page.tsx";
 
 const router = createBrowserRouter([
   {
@@ -31,6 +35,14 @@ const router = createBrowserRouter([
       {
         path: "/resourceGroups/:resourceGroupId/agents/:agentId/dashboards",
         element: <DashboardsPage />,
+      },
+      {
+        path: "/resourceGroups/:resourceGroupId/settings",
+        element: <ResourceGroupSettingsPage />,
+      },
+      {
+        path: "/resourceGroups/:resourceGroupId/agents/:agentId/alerts",
+        element: <AlertsPage />,
       },
     ],
   },
@@ -51,6 +63,8 @@ const theme = createTheme({
 });
 
 dayjs.extend(utc);
+dayjs.extend(duration);
+dayjs.extend(relativeTime);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

@@ -8,7 +8,6 @@ import org.hibernate.annotations.SQLRestriction;
 import org.springframework.util.Assert;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,27 +25,27 @@ public class Agent {
     private String name;
 
     @ManyToOne
+    @Getter
     private ResourceGroup resourceGroup;
 
     @Getter
     @Embedded
-    @Column(nullable = false, columnDefinition = "jsonb")
     private AgentConfig agentConfig;
 
     @Column(nullable = false)
-    private boolean isDeleted = false;
+    private final boolean isDeleted = false;
 
     @OneToMany(mappedBy = "agent", fetch = FetchType.LAZY)
     private List<Dashboard> dashboards;
 
     @Getter
-    @Column(nullable = true)
+    @Column
     private Instant lastContactAt;
 
     public Agent(String name, ResourceGroup resourceGroup, AgentConfig agentConfig) {
         Assert.notNull(name, "Name cannot be null");
         Assert.notNull(resourceGroup, "Resource group cannot be null");
-        Assert.notNull(agentConfig, "Agent config cannot be null");
+        Assert.notNull(agentConfig, "Agent agentConfig cannot be null");
         this.name = name;
         this.agentConfig = agentConfig;
         this.resourceGroup = resourceGroup;
@@ -69,4 +68,8 @@ public class Agent {
         this.lastContactAt = lastContactAt;
     }
 
+    public void setAgentConfig(AgentConfig newAgentConfig) {
+        Assert.notNull(newAgentConfig, "Agent agentConfig cannot be null");
+        this.agentConfig = newAgentConfig;
+    }
 }

@@ -16,6 +16,22 @@ export interface Agent{
     lastContactAt: string | null;
 }
 
+export interface AgentDetails extends Agent{
+    config: AgentConfig;
+}
+
+export interface AgentConfig {
+    collectEverySeconds: number
+    apiKey: string
+    motherboardEnabled: boolean
+    controllerEnabled: boolean
+    memoryEnabled: boolean
+    gpuEnabled: boolean
+    networkEnabled: boolean
+    cpuEnabled: boolean
+    storageEnabled: boolean
+  }
+
 export const getAgents = async (resourceGroupId: string, pageNumber: number, pageSize: number) : Promise<GetAgentsResponse> => {
     try {
         const response = await axiosInstance.get(`${config.apiUrl}/resourceGroups/${resourceGroupId}/agents?pageNumber=${pageNumber}&pageSize=${pageSize}`,);
@@ -33,9 +49,9 @@ export const getAgents = async (resourceGroupId: string, pageNumber: number, pag
 
 export interface CreateAgentRequest {
     name: string;
-    agentConfig: AgentConfig;
+    agentConfig: CreateAgentConfig;
 }
-interface AgentConfig {
+interface CreateAgentConfig {
     collectEverySeconds: number;
     isCpuEnabled: boolean;
     isGpuEnabled: boolean;
@@ -71,7 +87,12 @@ export interface Sensor{
 }
 export interface Metric{
     name: string;
-    types: string[];
+    types: MetricType[];
+}
+
+export interface MetricType{
+    name: string;
+    unit: string;
 }
 
 export const getAgentAvailableMetrics = async (resourceGroupId: string, agentId: string) : Promise<GetAgentAvailableMetricsResponse> => {
@@ -85,6 +106,39 @@ export const getAgentAvailableMetrics = async (resourceGroupId: string, agentId:
         return response.data;
     } catch (error) {
         console.error("Failed to get agent available metrics", error);
+        throw error;
+    }
+}
+
+export const updateAgent = async (resourceGroupId: string, agentId: string, request: CreateAgentRequest) => {
+    try {
+        const response = await axiosInstance.put(`${config.apiUrl}/resourceGroups/${resourceGroupId}/agents/${agentId}`, request, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.status !== 200) {
+            throw new Error('Failed to update agent');
+        }
+        return;
+    } catch (error) {
+        console.error("Failed to update agent", error);
+        throw error;
+    }
+}
+
+export const getAgent = async (resourceGroupId: string, agentId: string) : Promise<AgentDetails> => {
+    try {
+        const response = await axiosInstance.get(`${config.apiUrl}/resourceGroups/${resourceGroupId}/agents/${agentId}`);
+
+        if (response.status !== 200) {
+            throw new Error('Failed to get agent');
+        }
+
+        return response.data;
+    } catch (error) {
+        console.error("Failed to get agent", error);
         throw error;
     }
 }

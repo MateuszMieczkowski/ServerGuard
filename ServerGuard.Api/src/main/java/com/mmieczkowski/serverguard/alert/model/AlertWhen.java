@@ -1,6 +1,5 @@
 package com.mmieczkowski.serverguard.alert.model;
 
-import com.mmieczkowski.serverguard.alert.model.operator.Operator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Embedded;

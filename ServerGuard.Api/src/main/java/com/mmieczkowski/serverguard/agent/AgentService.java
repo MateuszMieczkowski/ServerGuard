@@ -1,13 +1,12 @@
 package com.mmieczkowski.serverguard.agent;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mmieczkowski.serverguard.agent.model.Agent;
-import com.mmieczkowski.serverguard.config.CacheConstants;
+import com.mmieczkowski.serverguard.agent.model.AgentConfig;
 import com.mmieczkowski.serverguard.agent.request.CreateAgentRequest;
 import com.mmieczkowski.serverguard.agent.response.CreateAgentResponse;
 import com.mmieczkowski.serverguard.agent.exception.AgentNotFoundException;
 import com.mmieczkowski.serverguard.agent.request.GetAgentRequest;
+import com.mmieczkowski.serverguard.agent.response.GetAgentConfigResponse;
 import com.mmieczkowski.serverguard.agent.response.GetAgentResponse;
 import com.mmieczkowski.serverguard.agent.request.GetAgentsPaginatedRequest;
 import com.mmieczkowski.serverguard.agent.response.GetAgentsPaginatedResponse;
@@ -19,11 +18,8 @@ import com.mmieczkowski.serverguard.resourcegroup.ResourceGroupRepository;
 import com.mmieczkowski.serverguard.service.SecureRandomString;
 import com.mmieczkowski.serverguard.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,16 +65,9 @@ public class AgentService {
         Agent agent = agentRepository.findAgentByIdAndUserId(agentId, userId)
                 .orElseThrow(AgentNotFoundException::new);
         agent.setName(request.name());
-        agent.getAgentConfig().setControllerEnabled(request.config().controllerEnabled());
-        agent.getAgentConfig().setCpuEnabled(request.config().cpuEnabled());
-        agent.getAgentConfig().setGpuEnabled(request.config().gpuEnabled());
-        agent.getAgentConfig().setMemoryEnabled(request.config().memoryEnabled());
-        agent.getAgentConfig().setMotherboardEnabled(request.config().motherboardEnabled());
-        agent.getAgentConfig().setNetworkEnabled(request.config().networkEnabled());
-        agent.getAgentConfig().setStorageEnabled(request.config().storageEnabled());
-        agent.getAgentConfig().setCollectEverySeconds(request.config().collectEverySeconds());
-        agentRepository.save(agent);
-
+        var newAgentConfig = request.agentConfig().toAgentConfig();
+        newAgentConfig.setApiKey(agent.getAgentConfig().getApiKey());
+        agent.setAgentConfig(newAgentConfig);
         agentRepository.save(agent);
     }
 
@@ -98,25 +87,33 @@ public class AgentService {
         return new GetAgentsPaginatedResponse(agents, request.pageNumber(), request.pageSize(), agentsPage.getTotalPages());
     }
 
-    public byte[] getAgentConfigFileAsJson(UUID resourceGroupId, UUID agentId) {
+    public void deleteAgent(UUID resourceGroupId, UUID agentId) {
         User user = userService.getLoggedInUser()
                 .orElseThrow();
         if (!user.hasAccessToResourceGroup(resourceGroupId)) {
             throw new ResourceGroupNotFoundException(resourceGroupId);
         }
-        Agent agent = agentRepository.findAgentByIdAndUserId(agentId, user.getId())
-                .orElseThrow(AgentNotFoundException::new);
-        var config = agent.getAgentConfig();
-        var responseConfig = new GetAgentResponse.AgentConfig(config);
-        var objectMapper = new ObjectMapper();
-        try {
-            String json = objectMapper.writeValueAsString(responseConfig);
-            return json.getBytes();
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        UUID userId = userService.getLoggedInUser()
+                .orElseThrow().getId();
+        var agentOptional = agentRepository.findAgentByIdAndUserId(agentId, userId);
+        if (agentOptional.isEmpty()) {
+            return;
         }
+        agentRepository.delete(agentOptional.get());
     }
 
-
-
+    public GetAgentConfigResponse getAgentConfig(String apiKey) {
+        Agent agent = agentRepository.findAgentByAgentConfigApiKey(apiKey)
+                .orElseThrow(AgentNotFoundException::new);
+        return new GetAgentConfigResponse(agent.getResourceGroup().getId(),
+                agent.getId(),
+                agent.getAgentConfig().isCpuEnabled(),
+                agent.getAgentConfig().isGpuEnabled(),
+                agent.getAgentConfig().isMemoryEnabled(),
+                agent.getAgentConfig().isMotherboardEnabled(),
+                agent.getAgentConfig().isControllerEnabled(),
+                agent.getAgentConfig().isNetworkEnabled(),
+                agent.getAgentConfig().isStorageEnabled(),
+                agent.getAgentConfig().getCollectEverySeconds());
+    }
 }

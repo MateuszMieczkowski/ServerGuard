@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getResourceGroup, ResourceGroup } from "../api/resource-group-service";
-import { getAgents, GetAgentsResponse } from "../api/agents-service";
+import {
+  AgentDetails,
+  getAgents,
+  GetAgentsResponse,
+} from "../api/agents-service";
 import {
   Container,
   Typography,
@@ -11,6 +15,7 @@ import {
   Pagination,
   Button,
   CardActions,
+  IconButton,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import AddIcon from "@mui/icons-material/Add";
@@ -19,6 +24,7 @@ import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import AnnouncementOutlinedIcon from "@mui/icons-material/AnnouncementOutlined";
 import MoreVertOutlinedIcon from "@mui/icons-material/MoreVertOutlined";
 import dayjs from "dayjs";
+import { UpdateAgentDialog } from "../components/update-agent-dialog";
 
 const AgentsPage = () => {
   const { resourceGroupId } = useParams();
@@ -30,9 +36,11 @@ const AgentsPage = () => {
     setRefreshAgents(!refreshAgents);
   };
   const [openCreateAgentDialog, setOpenCreateAgentDialog] = useState(false);
+  const [openUpdateAgentDialog, setOpenUpdateAgentDialog] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [getAgentsResponse, setGetAgentsResponse] =
     useState<GetAgentsResponse | null>(null);
+  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   useEffect(() => {
     getResourceGroup(resourceGroupId as string).then((response) => {
       setResourceGroup(response);
@@ -61,7 +69,7 @@ const AgentsPage = () => {
           alignContent: "center",
         }}
       >
-        <Typography variant="h4">Agents: {resourceGroup?.name}</Typography>
+        <Typography variant="h5">Agents: {resourceGroup?.name}</Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
@@ -88,7 +96,7 @@ const AgentsPage = () => {
                 borderColor:
                   agent.lastContactAt === null ||
                   dayjs(agent.lastContactAt).isBefore(
-                    dayjs().utc().subtract(5, "minutes")
+                    dayjs().subtract(5, "minutes")
                   )
                     ? "red"
                     : "primary.main",
@@ -98,9 +106,10 @@ const AgentsPage = () => {
                 <Typography variant="h6">{agent.name}</Typography>
                 <Typography variant="body2">
                   Last contact at:{" "}
-                  {dayjs(agent.lastContactAt)
-                    .utc()
-                    .format("DD:MM:YYYY/HH:mm:ss") ?? "-"}
+                  <strong>
+                    {dayjs(agent.lastContactAt).format("DD-MM-YYYY HH:mm:ss") ??
+                      "-"}
+                  </strong>
                 </Typography>
               </CardContent>
               <CardActions sx={{ my: "auto" }}>
@@ -110,8 +119,21 @@ const AgentsPage = () => {
                 >
                   Dashboards
                 </Button>
-                <Button startIcon={<AnnouncementOutlinedIcon />}>Alerts</Button>
-                <Button startIcon={<MoreVertOutlinedIcon />}>More</Button>
+                <Button
+                  startIcon={<AnnouncementOutlinedIcon />}
+                  onClick={() => navigate(`${agent.id}/alerts`)}
+                >
+                  Alerts
+                </Button>
+                <IconButton
+                  sx={{ flex: 1 }}
+                  onClick={() => {
+                    setSelectedAgentId(agent.id);
+                    setOpenUpdateAgentDialog(true);
+                  }}
+                >
+                  <MoreVertOutlinedIcon color="primary" />
+                </IconButton>
               </CardActions>
             </Card>
           </Grid>
@@ -131,6 +153,15 @@ const AgentsPage = () => {
         setOpen={setOpenCreateAgentDialog}
         onCreate={handleCreateAgent}
       />
+      {selectedAgentId && (
+        <UpdateAgentDialog
+          resourceGroupId={resourceGroupId as string}
+          open={openUpdateAgentDialog}
+          setOpen={setOpenUpdateAgentDialog}
+          onUpdate={() => setRefreshAgents(!refreshAgents)}
+          agentId={selectedAgentId}
+        ></UpdateAgentDialog>
+      )}
     </Container>
   );
 };

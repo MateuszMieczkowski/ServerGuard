@@ -17,7 +17,7 @@ public class AlertMetric{
     private final String metricName;
 
     @Column(nullable = false)
-    @Enumerated
+    @Enumerated(value = jakarta.persistence.EnumType.STRING)
     private final MetricType type;
 
     public AlertMetric(String sensorName, String metricName, MetricType type) {

@@ -42,7 +42,7 @@ public class UserResourceGroupPermission implements GrantedAuthority, Serializab
     private ResourceGroupUserRole role;
 
     @Column(nullable = false)
-    private boolean isDeleted = false;
+    private final boolean isDeleted = false;
 
 
     @Override

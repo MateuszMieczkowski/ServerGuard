@@ -1,6 +1,5 @@
 package com.mmieczkowski.serverguard.resourcegroup;
 
-import com.mmieczkowski.serverguard.config.CacheConstants;
 import com.mmieczkowski.serverguard.resourcegroup.model.ResourceGroup;
 import com.mmieczkowski.serverguard.resourcegroup.model.ResourceGroupUserRole;
 import com.mmieczkowski.serverguard.resourcegroup.model.UserResourceGroupPermission;
@@ -12,12 +11,9 @@ import com.mmieczkowski.serverguard.resourcegroup.request.GetResourceGroupPagina
 import com.mmieczkowski.serverguard.resourcegroup.response.GetResourceGroupPaginatedResponse;
 import com.mmieczkowski.serverguard.service.UserService;
 import jakarta.transaction.Transactional;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -53,8 +49,7 @@ public class ResourceGroupService {
         return new GetResourceGroupResponse(resourceGroup.getId(), resourceGroup.getName());
     }
 
-    public GetResourceGroupPaginatedResponse getResourceGroups(GetResourceGroupPaginatedRequest request,
-                                                               Authentication authentication) {
+    public GetResourceGroupPaginatedResponse getResourceGroups(GetResourceGroupPaginatedRequest request) {
         var user = userService.getLoggedInUser()
                 .orElseThrow();
         var pageable = PageRequest.of(request.pageNumber(), request.pageSize())
@@ -64,5 +59,26 @@ public class ResourceGroupService {
                 .map(GetResourceGroupPaginatedResponse.ResourceGroup::new)
                 .toList();
         return new GetResourceGroupPaginatedResponse(items, page.getNumber(), page.getSize(), page.getTotalPages());
+    }
+
+    public void deleteResourceGroup(UUID id) {
+        var user = userService.getLoggedInUser()
+                .orElseThrow();
+        if(!user.hasAccessToResourceGroup(id)){
+            throw new ResourceGroupNotFoundException(id);
+        }
+        resourceGroupRepository.deleteById(id);
+    }
+
+    public void updateResourceGroup(UUID id, CreateResourceGroupRequest request) {
+        var user = userService.getLoggedInUser()
+                .orElseThrow();
+        if(!user.hasAccessToResourceGroup(id)){
+            throw new ResourceGroupNotFoundException(id);
+        }
+        ResourceGroup resourceGroup = resourceGroupRepository.findById(id)
+                .orElseThrow(() -> new ResourceGroupNotFoundException(id));
+        resourceGroup.setName(request.name());
+        resourceGroupRepository.save(resourceGroup);
     }
 }

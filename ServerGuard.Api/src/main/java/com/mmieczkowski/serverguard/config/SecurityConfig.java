@@ -34,7 +34,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -57,6 +56,7 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui", "/swagger-ui/**", "/error", "/v3/api-docs/**").permitAll()
                         .requestMatchers("api/auth/login", "api/auth/register").permitAll()
                         .requestMatchers(("api/resourceGroups/{resourceGroupId}/agents/{agentId}/metrics"), HttpMethod.POST.name()).permitAll()
+                        .requestMatchers("api/agentConfig").permitAll()
                         .anyRequest().authenticated()
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))

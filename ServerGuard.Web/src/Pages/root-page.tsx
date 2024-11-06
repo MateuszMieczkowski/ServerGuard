@@ -138,13 +138,12 @@ const RootPage = () => {
                             </ListItemIcon>
                             <ListItemText primary="Agents" />
                           </ListItemButton>
-                          <ListItemButton sx={{ pl: 4 }}>
-                            <ListItemIcon>
-                              <TimelineOutlinedIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Dashboards" />
-                          </ListItemButton>
-                          <ListItemButton sx={{ pl: 4 }}>
+                          <ListItemButton
+                            sx={{ pl: 4 }}
+                            onClick={() =>
+                              navigate(`/resourceGroups/${group.id}/settings`)
+                            }
+                          >
                             <ListItemIcon>
                               <AdminPanelSettingsOutlinedIcon />
                             </ListItemIcon>

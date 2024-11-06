@@ -5,7 +5,6 @@ import com.mmieczkowski.serverguard.resourcegroup.response.CreateResourceGroupRe
 import com.mmieczkowski.serverguard.resourcegroup.response.GetResourceGroupResponse;
 import com.mmieczkowski.serverguard.resourcegroup.request.GetResourceGroupPaginatedRequest;
 import com.mmieczkowski.serverguard.resourcegroup.response.GetResourceGroupPaginatedResponse;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -32,7 +31,17 @@ public class ResourceGroupController {
     }
 
     @GetMapping()
-    public GetResourceGroupPaginatedResponse getResourceGroupsPaginated(GetResourceGroupPaginatedRequest request, Authentication authentication) {
-        return resourceGroupService.getResourceGroups(request, authentication);
+    public GetResourceGroupPaginatedResponse getResourceGroupsPaginated(GetResourceGroupPaginatedRequest request) {
+        return resourceGroupService.getResourceGroups(request);
+    }
+
+    @DeleteMapping("{id}")
+    public void deleteResourceGroup(@PathVariable UUID id) {
+        resourceGroupService.deleteResourceGroup(id);
+    }
+
+    @PutMapping("{id}")
+    public void updateResourceGroup(@PathVariable UUID id, @RequestBody CreateResourceGroupRequest request) {
+        resourceGroupService.updateResourceGroup(id, request);
     }
 }

@@ -46,4 +46,19 @@ public class DashboardController {
                                              @Validated GetGraphDataRequest request) {
         return dashboardService.getGraphData(resourceGroupId, agentId, dashboardId, graphId, request);
     }
+
+    @DeleteMapping("/{dashboardId}")
+    public void deleteDashboard(@PathVariable UUID resourceGroupId,
+                                @PathVariable UUID agentId,
+                                @PathVariable UUID dashboardId) {
+        dashboardService.deleteDashboard(resourceGroupId, agentId, dashboardId);
+    }
+
+    @PutMapping("/{dashboardId}")
+    public void updateDashboard(@PathVariable UUID resourceGroupId,
+                                @PathVariable UUID agentId,
+                                @PathVariable UUID dashboardId,
+                                @Validated @RequestBody CreateDashboardRequest request) {
+        dashboardService.updateDashboard(resourceGroupId, agentId, dashboardId, request);
+    }
 }

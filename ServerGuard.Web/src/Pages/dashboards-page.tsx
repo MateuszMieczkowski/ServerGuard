@@ -12,8 +12,11 @@ import {
   CircularProgress,
   Divider,
   Alert,
+  IconButton,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { useEffect, useState } from "react";
 import {
   LineChart,
@@ -29,6 +32,7 @@ import {
   Dashboard,
   DashboardListItem,
   DataPoint,
+  deleteDashboard,
   getDashboard,
   getDashboards,
   getGraphData,
@@ -37,6 +41,8 @@ import { DateTimePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { renderTimeViewClock } from "@mui/x-date-pickers/timeViewRenderers";
 import { CreateDashboardDialog } from "../components/create-dashboard-dialog";
+import { UpdateDashboardDialog } from "../components/update-dashboard-dialog";
+import { deleteConfirmationDialog } from "../components/delete-confirmation-dialog";
 
 const DashboardsPage = () => {
   const { resourceGroupId, agentId } = useParams();
@@ -64,7 +70,12 @@ const DashboardsPage = () => {
   const [openCreateDashboardDialog, setOpenCreateDashboardDialog] =
     useState(false);
 
+  const [openUpdateDashboardDialog, setOpenUpdateDashboardDialog] =
+    useState(false);
+
   const [refreshDashboards, setRefreshDashboards] = useState(false);
+
+  const [deleteConfirmation, setDeleteConfirmation] = useState(false);
 
   useEffect(() => {
     setSelectedDashboardId(null);
@@ -117,7 +128,7 @@ const DashboardsPage = () => {
       dataFrom.toISOString().replace("Z", ""),
       dataTo.toISOString().replace("Z", ""),
       graphIndex,
-      100,
+      200,
       aggretationType
     )
       .then((response) => {
@@ -147,6 +158,18 @@ const DashboardsPage = () => {
       });
     }
   };
+
+  const handleDeleteDashboard = () => {
+    if (selectedDashboard) {
+      deleteDashboard(resourceGroupId!, agentId!, selectedDashboardId!).then(
+        () => {
+          setSelectedDashboardId(null);
+          setSelectedDashboard(null);
+          setRefreshDashboards(!refreshDashboards);
+        }
+      );
+    }
+  };
   const graphWidth = 1200;
   const graphHeight = 400;
 
@@ -161,11 +184,20 @@ const DashboardsPage = () => {
           alignContent: "center",
         }}
       >
-        <Typography variant="h6">Dashboards</Typography>
-        <Button
-          startIcon={<AddIcon />}
-          onClick={() => setOpenCreateDashboardDialog(true)}
-        ></Button>
+        <Typography variant="h5">Dashboards</Typography>
+        <IconButton onClick={() => setOpenCreateDashboardDialog(true)}>
+          <AddIcon />
+        </IconButton>
+        {selectedDashboard && (
+          <IconButton onClick={() => setOpenUpdateDashboardDialog(true)}>
+            <EditIcon />
+          </IconButton>
+        )}
+        {selectedDashboard && (
+          <IconButton onClick={() => setDeleteConfirmation(true)}>
+            <DeleteIcon />
+          </IconButton>
+        )}
       </Stack>
 
       <Box
@@ -209,7 +241,7 @@ const DashboardsPage = () => {
         </FormControl>
         <DateTimePicker
           label="Data from"
-          format="YYYY-MM-DD HH:mm"
+          format="DD-MM-YYYY HH:mm"
           defaultValue={dataFrom}
           viewRenderers={{
             hours: renderTimeViewClock,
@@ -220,13 +252,12 @@ const DashboardsPage = () => {
               setDataFrom(date);
             }
           }}
-          timezone="UTC"
           ampm={false}
           sx={{ m: 2 }}
         />
         <DateTimePicker
           label="Data to"
-          format="YYYY-MM-DD HH:mm"
+          format="DD-MM-YYYY HH:mm"
           defaultValue={dataTo}
           viewRenderers={{
             hours: renderTimeViewClock,
@@ -238,7 +269,6 @@ const DashboardsPage = () => {
             }
           }}
           ampm={false}
-          timezone="UTC"
           sx={{ m: 2 }}
         />
         <Button
@@ -300,7 +330,10 @@ const DashboardsPage = () => {
                             tickCount={15}
                             domain={["dataMin", "dataMax"]}
                             tickFormatter={(unixTime) =>
-                              dayjs.unix(unixTime).format("HH:mm:ss")
+                              dayjs
+                                .unix(unixTime)
+                                .local()
+                                .format("DD-MM-YY HH:mm:ss")
                             }
                           />
                           <YAxis
@@ -315,8 +348,7 @@ const DashboardsPage = () => {
                               graph.metricType + ` [${graph.unit}]`,
                             ]}
                             labelFormatter={(label, _) =>
-                              "Time UTC: " +
-                              dayjs.unix(label).format("HH:mm:ss")
+                              "Time: " + dayjs.unix(label).format("HH:mm:ss")
                             }
                           />
                           <Legend verticalAlign="top" />
@@ -368,6 +400,27 @@ const DashboardsPage = () => {
           setRefreshDashboards(!refreshDashboards);
         }}
       ></CreateDashboardDialog>
+      {selectedDashboard && (
+        <UpdateDashboardDialog
+          agentId={agentId as string}
+          resourceGroupId={resourceGroupId as string}
+          open={openUpdateDashboardDialog}
+          setOpen={setOpenUpdateDashboardDialog}
+          onUpdate={() => {
+            setRefreshDashboards(!refreshDashboards);
+          }}
+          dashboard={selectedDashboard!}
+          dashboardId={selectedDashboardId!}
+        ></UpdateDashboardDialog>
+      )}
+      {deleteConfirmationDialog(
+        "dashboard",
+        deleteConfirmation,
+        () => {
+          setDeleteConfirmation(false);
+        },
+        handleDeleteDashboard
+      )}
     </Container>
   );
 };
