@@ -13,6 +13,8 @@ import {
   Divider,
   Alert,
   IconButton,
+  FormControlLabel,
+  Switch,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
@@ -43,6 +45,7 @@ import { renderTimeViewClock } from "@mui/x-date-pickers/timeViewRenderers";
 import { CreateDashboardDialog } from "../components/create-dashboard-dialog";
 import { UpdateDashboardDialog } from "../components/update-dashboard-dialog";
 import { deleteConfirmationDialog } from "../components/delete-confirmation-dialog";
+import { Client, StompSubscription } from "@stomp/stompjs";
 
 const DashboardsPage = () => {
   const { resourceGroupId, agentId } = useParams();
@@ -76,6 +79,80 @@ const DashboardsPage = () => {
   const [refreshDashboards, setRefreshDashboards] = useState(false);
 
   const [deleteConfirmation, setDeleteConfirmation] = useState(false);
+
+  //TODO: SEt to false
+  const [liveMode, setLiveMode] = useState(false);
+  const [stompSubscriptions, setStompSubscriptions] = useState<
+    StompSubscription[]
+  >([]);
+  const [liveModeMetrics, setLiveModeMetrics] = useState<WsMetrics[]>([]);
+
+  //TODO: set url from config
+  const [stompClient, setStompClient] = useState<Client>(() => {
+    var client = new Client({
+      brokerURL: "ws://localhost:8080/ws",
+      connectHeaders: {
+        Authorization: localStorage.getItem("authToken") || "",
+      },
+    });
+    client.activate();
+    return client;
+  });
+
+  interface WsMetrics {
+    time: string;
+    sensorMetrics: SensorMetric[];
+  }
+
+  interface SensorMetric {
+    name: string;
+    metrics: Metric[];
+  }
+
+  interface Metric {
+    name: string;
+    value: number;
+    type: string;
+  }
+
+  useEffect(() => {
+    if (!liveMode) {
+      return;
+    }
+    if (agentId) {
+      const subscripion = stompClient.subscribe(
+        `/topic/agents/${agentId}/metrics`,
+        (message) => {
+          if (liveMode) {
+            const wsMetrics: WsMetrics = JSON.parse(message.body);
+            setLiveModeMetrics((prevState) => [...prevState, wsMetrics]);
+          }
+        }
+      );
+      setStompSubscriptions((prevState) => [...prevState, subscripion]);
+    }
+  }, [agentId, liveMode]);
+
+  useEffect(() => {
+    if (!liveMode) {
+      return;
+    }
+    if (liveModeMetrics.length > 0) {
+     selectedDashboard?.graphs.forEach((graph, index) => {
+        const metrics = liveModeMetrics.filter((wsMetric) => {
+          wsMetric.sensorMetrics.forEach((sensorMetric) => {
+            if (
+              sensorMetric.name === graph.sensorName &&
+              sensorMetric.metrics.some((metric) => metric.name === graph.metricName)
+            ) {
+              return true;
+            }
+          });
+        });
+
+     })
+    }
+  }, [liveModeMetrics]);
 
   useEffect(() => {
     setSelectedDashboardId(null);
@@ -198,6 +275,20 @@ const DashboardsPage = () => {
             <DeleteIcon />
           </IconButton>
         )}
+        {selectedDashboard && (
+          <FormControlLabel
+            control={
+              <Switch
+                onChange={(_, checked) => {
+                  setLiveModeMetrics([]);
+                  setGraphData({});
+                  setLiveMode(checked);
+                }}
+              />
+            }
+            label="LiveMode"
+          />
+        )}
       </Stack>
 
       <Box
@@ -226,58 +317,62 @@ const DashboardsPage = () => {
             ))}
           </Select>
         </FormControl>
-        <FormControl sx={{ width: 100, m: 2 }}>
-          <InputLabel id="aggregation-select-label">Aggregation</InputLabel>
-          <Select
-            labelId="aggregation-select-label"
-            id="aggregation-select"
-            value={aggretationType}
-            label="Aggregation"
-            onChange={(event) => setAggregationType(event.target.value)}
-          >
-            <MenuItem value="AVG">AVG</MenuItem>
-            <MenuItem value="LTTB">LTTB</MenuItem>
-          </Select>
-        </FormControl>
-        <DateTimePicker
-          label="Data from"
-          format="DD-MM-YYYY HH:mm"
-          defaultValue={dataFrom}
-          viewRenderers={{
-            hours: renderTimeViewClock,
-            minutes: renderTimeViewClock,
-          }}
-          onChange={(date) => {
-            if (date) {
-              setDataFrom(date);
-            }
-          }}
-          ampm={false}
-          sx={{ m: 2 }}
-        />
-        <DateTimePicker
-          label="Data to"
-          format="DD-MM-YYYY HH:mm"
-          defaultValue={dataTo}
-          viewRenderers={{
-            hours: renderTimeViewClock,
-            minutes: renderTimeViewClock,
-          }}
-          onChange={(date) => {
-            if (date) {
-              setDataTo(date);
-            }
-          }}
-          ampm={false}
-          sx={{ m: 2 }}
-        />
-        <Button
-          variant="contained"
-          sx={{ m: 2 }}
-          onClick={handleLoadButtonClick}
-        >
-          Load
-        </Button>
+        {!liveMode && (
+          <>
+            <FormControl sx={{ width: 100, m: 2 }}>
+              <InputLabel id="aggregation-select-label">Aggregation</InputLabel>
+              <Select
+                labelId="aggregation-select-label"
+                id="aggregation-select"
+                value={aggretationType}
+                label="Aggregation"
+                onChange={(event) => setAggregationType(event.target.value)}
+              >
+                <MenuItem value="AVG">AVG</MenuItem>
+                <MenuItem value="LTTB">LTTB</MenuItem>
+              </Select>
+            </FormControl>
+            <DateTimePicker
+              label="Data from"
+              format="DD-MM-YYYY HH:mm"
+              defaultValue={dataFrom}
+              viewRenderers={{
+                hours: renderTimeViewClock,
+                minutes: renderTimeViewClock,
+              }}
+              onChange={(date) => {
+                if (date) {
+                  setDataFrom(date);
+                }
+              }}
+              ampm={false}
+              sx={{ m: 2 }}
+            />
+            <DateTimePicker
+              label="Data to"
+              format="DD-MM-YYYY HH:mm"
+              defaultValue={dataTo}
+              viewRenderers={{
+                hours: renderTimeViewClock,
+                minutes: renderTimeViewClock,
+              }}
+              onChange={(date) => {
+                if (date) {
+                  setDataTo(date);
+                }
+              }}
+              ampm={false}
+              sx={{ m: 2 }}
+            />
+            <Button
+              variant="contained"
+              sx={{ m: 2 }}
+              onClick={handleLoadButtonClick}
+            >
+              Load
+            </Button>
+          </>
+        )}
       </Box>
       {!loading && (
         <Box

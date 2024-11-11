@@ -105,10 +105,11 @@ const AgentsPage = () => {
               <CardContent>
                 <Typography variant="h6">{agent.name}</Typography>
                 <Typography variant="body2">
-                  Last contact at:{" "}
+                  Last contact at: &nbsp;
                   <strong>
-                    {dayjs(agent.lastContactAt).format("DD-MM-YYYY HH:mm:ss") ??
-                      "-"}
+                    {agent.lastContactAt
+                      ? dayjs(agent.lastContactAt).format("DD-MM-YYYY HH:mm:ss")
+                      : "-"}
                   </strong>
                 </Typography>
               </CardContent>

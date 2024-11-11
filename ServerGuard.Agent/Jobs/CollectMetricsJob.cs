@@ -34,19 +34,7 @@ internal sealed class CollectMetricsJob : IJob
         var agentConfig = await _agentConfigProvider.GetAsync(context.CancellationToken);
         var metrics = await _metricCollector.CollectAsync();
         await _integrationApi.SendMetrics(_configuration.GetValue<string>("ApiKey"), agentConfig.ResourceGroupId, agentConfig.AgentId, metrics, context.CancellationToken);
-        // await RescheduleJob(context, agentConfig);
         _logger.LogInformation("Metrics collected");
         await Task.Delay(TimeSpan.FromSeconds(agentConfig.CollectEverySeconds), context.CancellationToken);
-    }
-
-    private static async Task RescheduleJob(IJobExecutionContext context, AgentConfig agentConfig)
-    {
-        TriggerBuilder triggerBuilder = TriggerBuilder.Create()
-                   .WithIdentity($"{nameof(CollectMetricsJob)}Trigger {Guid.NewGuid()}")
-                   .ForJob(context.JobDetail)
-                   .WithSimpleSchedule(schedule => schedule.WithInterval(TimeSpan.FromSeconds(agentConfig.CollectEverySeconds))
-                       .RepeatForever());
-        // await context.Scheduler.UnscheduleJob(context.Trigger.Key, context.CancellationToken);
-        await context.Scheduler.RescheduleJob(context.Trigger.Key, triggerBuilder.Build(), context.CancellationToken);
     }
 }

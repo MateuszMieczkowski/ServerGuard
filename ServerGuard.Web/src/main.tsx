@@ -66,6 +66,10 @@ dayjs.extend(utc);
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
 
+window.addEventListener("authTokenRemoved", () => {
+  router.navigate("/sign-in");
+});
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <LocalizationProvider dateAdapter={AdapterDayjs}>

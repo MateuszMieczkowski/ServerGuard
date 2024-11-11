@@ -13,6 +13,7 @@ import com.mmieczkowski.serverguard.service.UserService;
 import com.mmieczkowski.serverguard.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +35,7 @@ public class MetricService {
     private final MetricRepository metricRepository;
     private final UserService userService;
     private final Clock clock;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     public void collectMetrics(String apiKey, SaveMetricsRequest saveMetricsRequest) {
         Agent agent = agentRepository.findAgentByAgentConfigApiKey(apiKey)
@@ -57,6 +59,8 @@ public class MetricService {
             }
         }
         metricRepository.saveAll(metricsToInsert);
+        String destination = String.format("/topic/agents/%s/metrics", agent.getId());
+        simpMessagingTemplate.convertAndSend(destination, saveMetricsRequest);
     }
 
     public GetAvailableMetricsResponse getAvailableMetrics(UUID resourceGroupId, UUID agentId) {

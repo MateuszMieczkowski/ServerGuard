@@ -9,8 +9,7 @@ axiosInstance.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       console.log('Unauthenticated, logging out ...');
       localStorage.removeItem('authToken');
-      const navigate = useNavigate();
-      navigate('/sign-in');
+      window.dispatchEvent(new Event('authTokenRemoved'));
     }
     return Promise.reject(error);
   }

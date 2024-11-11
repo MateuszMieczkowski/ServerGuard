@@ -7,31 +7,24 @@ using ServerGuard.Agent.Services;
 using ServerGuard.Agent.Config;
 using Refit;
 using Microsoft.Extensions.Configuration;
-using System.Net;
-using System.Text.Json;
-using System.Net.Http.Json;
 
 var builder = Host.CreateApplicationBuilder();
 
 builder.Services.AddSerilog((_, config) => config.ReadFrom.Configuration(builder.Configuration));
 
-// if (!RootChecker.IsRoot())
-// {
-//     var errMsg = "Agent must be run as root";
-//     Log.Fatal(errMsg);
-//     return;
-// }
-// var httpClient = new HttpClient();
-// var baseApiUrl = builder.Configuration.GetConnectionString("ApiUrl");
-// var httpRequest = new HttpRequestMessage(HttpMethod.Get, baseApiUrl + "/api/agentConfig");
-// httpRequest.Headers.Add("x-api-key", builder.Configuration.GetValue<string>("ApiKey"));
-// HttpResponseMessage response = await httpClient.SendAsync(httpRequest);
-// if (response.StatusCode != HttpStatusCode.OK)
-// {
-//     Log.Fatal("Failed to get agent config: {response}", response);
-//     return;
-// }
-// var agentConfig = await response.Content.ReadFromJsonAsync<AgentConfig>();
+if (!RootChecker.IsRoot())
+{
+    var errMsg = "Agent must be run as root";
+    Log.Fatal(errMsg);
+    return;
+}
+
+if (builder.Configuration.GetConnectionString("ApiUrl") is null || builder.Configuration.GetValue<string>("ApiKey") is null)
+{
+    var errMsg = "ApiUrl and ApiKey must be provided";
+    Log.Fatal(errMsg);
+    return;
+}
 
 builder.Services.AddMemoryCache();
 AddQuartz(builder);

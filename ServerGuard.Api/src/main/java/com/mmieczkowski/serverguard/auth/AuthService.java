@@ -6,6 +6,7 @@ import com.mmieczkowski.serverguard.auth.request.RegisterRequest;
 import com.mmieczkowski.serverguard.auth.response.RegisterResponse;
 import com.mmieczkowski.serverguard.user.User;
 import com.mmieczkowski.serverguard.user.UserRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -40,14 +41,17 @@ public class AuthService {
     }
 
     public RegisterResponse register(RegisterRequest registerRequest) {
-
         UserDetails userDetails = org.springframework.security.core.userdetails.User.withUsername(registerRequest.email())
                 .password(registerRequest.password())
                 .authorities("ROLE_USER")
                 .passwordEncoder(passwordEncoder::encode)
                 .build();
         User user = new User(userDetails);
-        userRepository.save(user);
+        try {
+            userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            return new RegisterResponse(false);
+        }
         return new RegisterResponse(true);
     }
 }

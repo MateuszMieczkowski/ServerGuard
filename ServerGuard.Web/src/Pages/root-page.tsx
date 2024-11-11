@@ -116,7 +116,10 @@ const RootPage = () => {
                 getResourceGroupsResponse.resourceGroups.map((group) => {
                   return (
                     <>
-                      <ListItemButton onClick={() => handleClick(group.id)}>
+                      <ListItemButton
+                        onClick={() => handleClick(group.id)}
+                        id={group.id}
+                      >
                         <ListItemIcon>
                           <AppsIcon />
                         </ListItemIcon>
