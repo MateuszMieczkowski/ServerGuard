@@ -27,7 +27,10 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
         cache: maven
-
+        
+    - name: Create certs directory
+      run: mkdir ./ServerGuard.Api/src/main/resources/certs
+      
     - name: Set private jwt cert
       run: echo "${{ secrets.JWT_PRIVATE_CERT }}" >> ./ServerGuard.Api/src/main/resources/certs/private.pem
       
