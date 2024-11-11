@@ -27,18 +27,24 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
         cache: maven
+    - name: Set spring secrets.yaml
+      run: echo ${{ secrets.SPRING_SECRETS }} >> ./ServerGuard.Api/src/main/resources/secrets.yml
     
     - name: Build with Maven
       run: mvn -B package --file ./ServerGuard.Api/pom.xml
+      
     - name: Show contents of the current working directory
-      run: ls -la
+      run: ls -la ./ServerGuard.Api
+      
     - name: Show contents of the target directory
       run: ls -la ./ServerGuard.Api/target
+      
     - name: Login to Docker Hub
       uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
+        
     - name: Build and push docker image
       uses: docker/build-push-action@v6
       with:
