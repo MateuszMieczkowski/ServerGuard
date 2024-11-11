@@ -28,7 +28,7 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Set spring secrets.yaml
-      run: echo ${{ secrets.SPRING_SECRETS }} >> ./ServerGuard.Api/src/main/resources/secrets.yml
+      run: echo "${{ secrets.SPRING_SECRETS }}" >> ./ServerGuard.Api/src/main/resources/secrets.yml
     
     - name: Build with Maven
       run: mvn -B package --file ./ServerGuard.Api/pom.xml
