@@ -28,7 +28,7 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run: mvn -B package --file ./ServerGuard.Api/pom.xml
     - name: Upload Maven build artifact
       uses: actions/upload-artifact@v4.4.3
       with:
