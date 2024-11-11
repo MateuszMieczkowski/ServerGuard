@@ -27,6 +27,13 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
         cache: maven
+
+    - name: Set private jwt cert
+      run: echo "${{ secrets.JWT_PRIVATE_CERT }}" >> ./ServerGuard.Api/src/main/resources/certs/private.pem
+      
+    - name: Set public jwt cert
+      run: echo "${{ secrets.JWT_PUBLIC_CERT }}" >> ./ServerGuard.Api/src/main/resources/certs/public.pem
+      
     - name: Set spring secrets.yaml
       run: echo "${{ secrets.SPRING_SECRETS }}" >> ./ServerGuard.Api/src/main/resources/secrets.yml
     
