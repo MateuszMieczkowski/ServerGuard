@@ -29,7 +29,12 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B package --file ./ServerGuard.Api/pom.xml
+    - name: Show contents of the current working directory
+      run: ls -la
+    - name: Show contents of the target directory
+      run: ls -la ./ServerGuard.Api/target
     - name: Upload Maven build artifact
       uses: actions/upload-artifact@v4.4.3
       with:
         name: artifact
+        path: ./ServerGuard.Api/target/api-0.0.1-SNAPSHOT.jar
