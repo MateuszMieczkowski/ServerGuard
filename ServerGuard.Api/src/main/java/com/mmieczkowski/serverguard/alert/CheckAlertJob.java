@@ -41,10 +41,9 @@ public class CheckAlertJob {
         log.info("Checking alerts");
         List<Alert> alertToCheck = alertRepository.findAllWhereNextCheckIsNullOrPast();
         alertToCheck.forEach(alert -> {
-            try{
+            try {
                 CheckAlert(alert);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 log.error("Error checking alert {}", alert.getId(), e);
             }
         });
@@ -52,13 +51,12 @@ public class CheckAlertJob {
 
     private void CheckAlert(Alert alert) {
         log.info("Checking alert {}", alert.getName());
-        float metricValue =  getMetricValue(alert);
-        if(alert.check(metricValue, clock)) {
+        float metricValue = getMetricValue(alert);
+        if (alert.check(metricValue, clock)) {
             log.info("Alert {} triggered", alert.getName());
             var alertLog = new AlertLog(alert, metricValue, clock);
             alertLogRepository.save(alertLog);
-            if(alert.shouldNotify(clock))
-            {
+            if (alert.shouldNotify(clock)) {
                 try {
                     sendNotification(alertLog);
                 } catch (Exception e) {
@@ -83,13 +81,13 @@ public class CheckAlertJob {
 
     private void sendNotification(AlertLog alertLog) {
         var recipientEmails = resourceGroupRepository.findAllResourceGroupUserEmails(alertLog.getAgent().getResourceGroup().getId());
-            executorService.submit(() -> {
-                try {
-                    sendEmail(alertLog, recipientEmails.toArray(new String[0]));
-                } catch (MessagingException e) {
-                    log.error("Error sending email for alertLog with id: {}", alertLog.getId(), e);
-                }
-            });
+        executorService.submit(() -> {
+            try {
+                sendEmail(alertLog, recipientEmails.toArray(new String[0]));
+            } catch (MessagingException e) {
+                log.error("Error sending email for alertLog with id: {}", alertLog.getId(), e);
+            }
+        });
     }
 
     private void sendEmail(AlertLog alertLog, String[] emails) throws MessagingException {
@@ -100,6 +98,7 @@ public class CheckAlertJob {
         helper.setText(GetFilledTemplate(alertLog), true);
         mailSender.send(mimeMessage);
     }
+
     private String GetFilledTemplate(AlertLog alertLog) {
         final String templateName = "alertEmailTemplate.html";
         try {
