@@ -19,6 +19,7 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -33,6 +34,7 @@ public class CheckAlertJob {
     private final Clock clock;
     private final EmailTemplateProvider emailTemplateProvider;
     private final JavaMailSender mailSender;
+    private static final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
 
     @Scheduled(fixedRate = 1, timeUnit = TimeUnit.MINUTES)
     public void checkAlerts() {
@@ -81,7 +83,6 @@ public class CheckAlertJob {
 
     private void sendNotification(AlertLog alertLog) {
         var recipientEmails = resourceGroupRepository.findAllResourceGroupUserEmails(alertLog.getAgent().getResourceGroup().getId());
-        try (var executorService = Executors.newVirtualThreadPerTaskExecutor()) {
             executorService.submit(() -> {
                 try {
                     sendEmail(alertLog, recipientEmails.toArray(new String[0]));
@@ -89,7 +90,6 @@ public class CheckAlertJob {
                     log.error("Error sending email for alertLog with id: {}", alertLog.getId(), e);
                 }
             });
-        }
     }
 
     private void sendEmail(AlertLog alertLog, String[] emails) throws MessagingException {
