@@ -25,4 +25,4 @@ docker stop "$CONTAINER_NAME"
 docker rm "$CONTAINER_NAME"
 
 # Run the new image
-docker run -d --name "$CONTAINER_NAME" "$IMAGE_NAME"
+docker run -p 8080:8080 -d --name "$CONTAINER_NAME" "$IMAGE_NAME" -p 8080:8080
