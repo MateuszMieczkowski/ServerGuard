@@ -3,7 +3,7 @@ name: ServerGuard Api build
 on:
   push:
     branches: [ "master" ]
-
+    paths: ["./ServerGuard.Api/**"]
 jobs:
   build:
 
