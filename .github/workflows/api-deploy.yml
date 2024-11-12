@@ -19,4 +19,4 @@ jobs:
        run: chmod 400 ssh_key
        
      - name: Create certs directory
-       run: ssh -i ./ssh_key ${{ secrets.HETZNER_USER }}@${{ secrets.HETZNER_IP }} "bash -s ${{ secrets.DOCKERHUB_USERNAME }} ${{ secrets.DOCKERHUB_TOKEN }}" < ./scripts/api-deploy.sh
+       run: ssh -o StrictHostKeyChecking=no -i ./ssh_key ${{ secrets.HETZNER_USER }}@${{ secrets.HETZNER_IP }} "bash -s ${{ secrets.DOCKERHUB_USERNAME }} ${{ secrets.DOCKERHUB_TOKEN }}" < ./scripts/api-deploy.sh
