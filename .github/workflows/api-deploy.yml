@@ -14,7 +14,9 @@ jobs:
      - uses: actions/checkout@v4
      - name: Create ssh key
        run: echo "${{ secrets.HETZNER_SSH_KEY }}" >> ./ssh_key
-
-    
+       
+     - name: Set permission to ssh key
+       run: chmod 400 ssh_key
+       
      - name: Create certs directory
        run: ssh -i ./ssh_key ${{ secrets.HETZNER_USER }}@${{ secrets.HETZNER_IP }} "bash -s ${{ secrets.DOCKERHUB_USERNAME }} ${{ secrets.DOCKERHUB_TOKEN }}" < ./scripts/api-deploy.sh
