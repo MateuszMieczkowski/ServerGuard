@@ -1,4 +1,4 @@
-name: ServerGuard Api build
+name: ServerGuard Web build
 
 on:
   push:
