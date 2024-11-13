@@ -1,9 +1,7 @@
 package com.mmieczkowski.serverguard.agent;
 
-import com.mmieczkowski.serverguard.config.CacheConstants;
 import com.mmieczkowski.serverguard.agent.model.Agent;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,7 +14,6 @@ import java.util.UUID;
 public interface AgentRepository extends JpaRepository<Agent, UUID> {
 
     Optional<Agent> findAgentByAgentConfigApiKey(String apiKey);
-
 
     @Query("SELECT a FROM Agent a " +
             "WHERE a.id = :agentId " +

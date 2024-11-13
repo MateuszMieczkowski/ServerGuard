@@ -1,0 +1,24 @@
+name: ServerGuard deploy
+
+on:
+  workflow_run:
+    workflows: ["ServerGuard Api build", "ServerGuard Web build"]
+    types: ["completed"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create ssh key
+        run: echo "${{ secrets.HETZNER_SSH_KEY }}" >> ./ssh_key
+
+      - name: Set permission to ssh key
+        run: chmod 400 ssh_key
+
+      - name: Copy docker compose file to hetzner VM
+        run: scp -o StrictHostKeyChecking=no -i ./ssh_key ./docker-compose.yml ${{ secrets.HETZNER_USER }}@${{ secrets.HETZNER_IP }}:/home/${{ secrets.HETZNER_USER }}/deploy/docker-compose.yml
+
+      - name: Deploy to Hetzner VM
+        run: ssh -o StrictHostKeyChecking=no -i ./ssh_key ${{ secrets.HETZNER_USER }}@${{ secrets.HETZNER_IP }} "bash -s ${{ secrets.DOCKERHUB_USERNAME }} ${{ secrets.DOCKERHUB_TOKEN }} ${{ secrets.PG_PASSWORD }} ${{ secrets.CLICKHOUSE_PASSWORD }}" < ./scripts/api-deploy.sh

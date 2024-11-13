@@ -3,7 +3,6 @@ package com.mmieczkowski.serverguard.agent;
 import com.mmieczkowski.serverguard.agent.request.CreateAgentRequest;
 import com.mmieczkowski.serverguard.agent.response.CreateAgentResponse;
 import com.mmieczkowski.serverguard.agent.request.GetAgentRequest;
-import com.mmieczkowski.serverguard.agent.response.GetAgentConfigResponse;
 import com.mmieczkowski.serverguard.agent.response.GetAgentResponse;
 import com.mmieczkowski.serverguard.agent.request.GetAgentsPaginatedRequest;
 import com.mmieczkowski.serverguard.agent.response.GetAgentsPaginatedResponse;
@@ -22,7 +21,7 @@ public class AgentController {
 
     @PostMapping
     public CreateAgentResponse createAgent(@PathVariable UUID resourceGroupId,
-                                           @Validated @RequestBody CreateAgentRequest request) {
+            @Validated @RequestBody CreateAgentRequest request) {
         return agentService.createAgent(resourceGroupId, request);
     }
 
@@ -33,13 +32,14 @@ public class AgentController {
 
     @PutMapping("/{agentId}")
     public void updateAgent(@PathVariable UUID resourceGroupId,
-                            @PathVariable UUID agentId,
-                            @Validated @RequestBody UpdateAgentRequest request) {
+            @PathVariable UUID agentId,
+            @Validated @RequestBody UpdateAgentRequest request) {
         agentService.updateAgent(agentId, request);
     }
 
     @GetMapping
-    public GetAgentsPaginatedResponse getAgentsPaginated(@PathVariable UUID resourceGroupId, GetAgentsPaginatedRequest request) {
+    public GetAgentsPaginatedResponse getAgentsPaginated(@PathVariable UUID resourceGroupId,
+            GetAgentsPaginatedRequest request) {
         return agentService.getAgentsPaginated(resourceGroupId, request);
     }
 

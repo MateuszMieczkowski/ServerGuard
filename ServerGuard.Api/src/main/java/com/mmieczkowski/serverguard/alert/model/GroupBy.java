@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Embeddable
 public class GroupBy {
-    private static final String[] aggregateFunctions = { "AVG", "MIN", "MAX"};
+    // private static final String[] aggregateFunctions = { "AVG", "MIN", "MAX"};
 
     @Column(nullable = false)
     @Getter

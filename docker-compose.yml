@@ -1,0 +1,38 @@
+services:
+  serverguard.api:
+    image: mmieczkowski/serverguard-api:latest
+    ports:
+    - "8080:8080"
+    restart: always
+    depends_on:
+      - serviceName: serverguard.postgres
+        condition: service_healthy
+      - serviceName: serverguard.clickhouse
+        condition: service_healthy
+
+  serverguard.web:
+    image: mmieczkowski/serverguard-web:latest
+    ports:
+    - "3000:80"
+    restart: always
+
+  serverguard.postgres:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./volumes/postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: "{PG_PASSWORD}"
+    restart: always
+
+  serverguard.clickhouse:
+    image: clickhouse/clickhouse-server
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+    environment:
+      CLICKHOUSE_PASSWORD: "CLICKHOUSE_PASSWORD"
+      CLICKHOUSE_USER: "default"
+    restart: always
