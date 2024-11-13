@@ -15,9 +15,8 @@ import {
   Button,
   Pagination,
 } from "@mui/material";
-import { Navigate, Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
-import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import AddIcon from "@mui/icons-material/Add";
 import CreateResourceGroupDialog from "../components/create-resource-group-dialog";

@@ -14,8 +14,6 @@ import {
 } from "@mui/material";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { createResourceGroup } from "../api/resource-group-service";
-import { Label } from "@mui/icons-material";
 import { createAgent, CreateAgentRequest } from "../api/agents-service";
 
 interface CreateAgentDialogProps {

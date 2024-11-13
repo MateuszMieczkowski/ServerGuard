@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getResourceGroup, ResourceGroup } from "../api/resource-group-service";
-import {
-  AgentDetails,
-  getAgents,
-  GetAgentsResponse,
-} from "../api/agents-service";
+import { getAgents, GetAgentsResponse } from "../api/agents-service";
 import {
   Container,
   Typography,

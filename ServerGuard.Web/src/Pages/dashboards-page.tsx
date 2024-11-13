@@ -10,8 +10,6 @@ import {
   MenuItem,
   Select,
   CircularProgress,
-  Divider,
-  Alert,
   IconButton,
   FormControlLabel,
   Switch,
@@ -46,8 +44,10 @@ import { CreateDashboardDialog } from "../components/create-dashboard-dialog";
 import { UpdateDashboardDialog } from "../components/update-dashboard-dialog";
 import { deleteConfirmationDialog } from "../components/delete-confirmation-dialog";
 import { Client, StompSubscription } from "@stomp/stompjs";
+import getConfig from "../config";
 
 const DashboardsPage = () => {
+  const config = getConfig();
   const { resourceGroupId, agentId } = useParams();
   const [dashboards, setDashboards] = useState<DashboardListItem[]>([]);
   const [selectedDashboardId, setSelectedDashboardId] = useState<string | null>(
@@ -82,15 +82,13 @@ const DashboardsPage = () => {
 
   //TODO: SEt to false
   const [liveMode, setLiveMode] = useState(false);
-  const [stompSubscriptions, setStompSubscriptions] = useState<
-    StompSubscription[]
-  >([]);
+  const [_, setStompSubscriptions] = useState<StompSubscription[]>([]);
   const [liveModeMetrics, setLiveModeMetrics] = useState<WsMetrics[]>([]);
 
   //TODO: set url from config
-  const [stompClient, setStompClient] = useState<Client>(() => {
+  const [stompClient] = useState<Client>(() => {
     var client = new Client({
-      brokerURL: "ws://localhost:8080/ws",
+      brokerURL: config.webSocketUrl,
       connectHeaders: {
         Authorization: localStorage.getItem("authToken") || "",
       },
@@ -137,21 +135,22 @@ const DashboardsPage = () => {
     if (!liveMode) {
       return;
     }
-    if (liveModeMetrics.length > 0) {
-     selectedDashboard?.graphs.forEach((graph, index) => {
-        const metrics = liveModeMetrics.filter((wsMetric) => {
-          wsMetric.sensorMetrics.forEach((sensorMetric) => {
-            if (
-              sensorMetric.name === graph.sensorName &&
-              sensorMetric.metrics.some((metric) => metric.name === graph.metricName)
-            ) {
-              return true;
-            }
-          });
-        });
-
-     })
-    }
+    // if (liveModeMetrics.length > 0) {
+    //   selectedDashboard?.graphs.forEach((graph, _) => {
+    //     const metrics = liveModeMetrics.filter((wsMetric) => {
+    //       wsMetric.sensorMetrics.forEach((sensorMetric) => {
+    //         if (
+    //           sensorMetric.name === graph.sensorName &&
+    //           sensorMetric.metrics.some(
+    //             (metric) => metric.name === graph.metricName
+    //           )
+    //         ) {
+    //           return true;
+    //         }
+    //       });
+    //     });
+    //   });
+    // }
   }, [liveModeMetrics]);
 
   useEffect(() => {
@@ -230,7 +229,7 @@ const DashboardsPage = () => {
 
   const handleLoadButtonClick = () => {
     if (selectedDashboard) {
-      selectedDashboard.graphs.forEach((graph, index) => {
+      selectedDashboard.graphs.forEach((_, index) => {
         loadGraphData(index);
       });
     }
@@ -438,7 +437,7 @@ const DashboardsPage = () => {
                             unit={graph.unit}
                           />
                           <Tooltip
-                            formatter={(value, name, props) => [
+                            formatter={(value, _name, _props) => [
                               value,
                               graph.metricType + ` [${graph.unit}]`,
                             ]}

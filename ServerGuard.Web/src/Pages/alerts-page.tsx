@@ -12,25 +12,11 @@ import {
 } from "../api/alerts-service";
 import { Page } from "../api/Page";
 import { useParams } from "react-router-dom";
-import {
-  IconButton,
-  Paper,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Button,
-} from "@mui/material";
+import { IconButton, Paper } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
-import {
-  DataGrid,
-  GridToolbarContainer,
-  GridSlots,
-  GridToolbarProps,
-} from "@mui/x-data-grid";
+import { DataGrid, GridToolbarContainer, GridSlots } from "@mui/x-data-grid";
 import AddIcon from "@mui/icons-material/Add";
 import { CreateAlertDialog } from "../components/create-alert-dialog";
 import { deleteConfirmationDialog } from "../components/delete-confirmation-dialog";
@@ -102,7 +88,7 @@ export function AlertsPage() {
   const { resourceGroupId, agentId } = useParams();
   const [tabValue, setTabValue] = React.useState(0);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
@@ -237,7 +223,7 @@ export function AlertsPage() {
                   field: "duration",
                   headerName: "Duration",
                   flex: 1,
-                  valueGetter: (value, row, column) => {
+                  valueGetter: (value, _row, _column) => {
                     return dayjs.duration(value).locale("en").humanize();
                   },
                 },
@@ -284,7 +270,7 @@ export function AlertsPage() {
                   field: "triggeredAt",
                   headerName: "Triggered at",
                   flex: 1,
-                  valueGetter: (value, row, column) => {
+                  valueGetter: (value, _row, _column) => {
                     return dayjs(value).format("YYYY-MM-DD HH:mm:ss");
                   },
                 },
@@ -303,7 +289,7 @@ export function AlertsPage() {
                   field: "duration",
                   headerName: "Duration",
                   flex: 1,
-                  valueGetter: (value, row, column) => {
+                  valueGetter: (value, _row, _column) => {
                     return dayjs.duration(value).locale("en").humanize();
                   },
                 },

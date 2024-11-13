@@ -16,12 +16,8 @@ import {
 } from "@mui/material";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { createResourceGroup } from "../api/resource-group-service";
-import { Label } from "@mui/icons-material";
 import {
-  Agent,
   AgentDetails,
-  createAgent,
   CreateAgentRequest,
   getAgent,
   updateAgent,
@@ -83,7 +79,7 @@ export const UpdateAgentDialog: React.FC<UpdateAgentDialogProps> = ({
             isMotherboardEnabled: response.config.motherboardEnabled,
             isStorageEnabled: response.config.storageEnabled,
           })
-          .catch((error) => {
+          .catch(() => {
             setLoading(false);
           });
         setLoading(false);

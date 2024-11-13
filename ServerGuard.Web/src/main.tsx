@@ -1,4 +1,4 @@
-import { StrictMode, useEffect } from "react";
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";

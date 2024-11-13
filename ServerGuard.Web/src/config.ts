@@ -1,10 +1,13 @@
+import { apiUrl, webSocketUrl } from '../config.json';
 
 interface Config {
   apiUrl: string;
+  webSocketUrl: string;
 }
 
 const config: Config = {
-  apiUrl: "http://localhost:8080/api",
+  apiUrl: apiUrl,
+  webSocketUrl: webSocketUrl
 };
 
 const getConfig = () => config;

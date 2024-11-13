@@ -19,7 +19,7 @@ import {
   Snackbar,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import { createDashboard, Dashboard, Graph } from "../api/dashboards-service";
+import { createDashboard, Graph } from "../api/dashboards-service";
 import {
   getAgentAvailableMetrics,
   GetAgentAvailableMetricsResponse,
@@ -27,7 +27,6 @@ import {
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { SketchPicker } from "react-color";
 
 interface CreateDashboardDialogProps {
   resourceGroupId: string;
