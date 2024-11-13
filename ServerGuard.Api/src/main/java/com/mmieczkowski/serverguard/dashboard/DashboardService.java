@@ -77,7 +77,7 @@ public class DashboardService {
 
         public GetDashboardsResponse getDashboards(UUID resourceGroupId, UUID agentId) {
                 var user = getUserOrThrow(resourceGroupId);
-                Agent agent = agentRepository.findAgentByIdAndUserId(agentId, user.getId())
+                agentRepository.findAgentByIdAndUserId(agentId, user.getId())
                                 .orElseThrow(AgentNotFoundException::new);
                 var dashboards = dashboardRepository.findAllByAgentId(agentId, Sort.by("name")).stream()
                                 .map(dashboard -> new GetDashboardsResponse.Dashboard(dashboard.getId(),
@@ -147,7 +147,7 @@ public class DashboardService {
         public void updateDashboard(UUID resourceGroupId, UUID agentId, UUID dashboardId,
                         CreateDashboardRequest request) {
                 var user = getUserOrThrow(resourceGroupId);
-                Agent agent = agentRepository.findAgentByIdAndUserId(agentId, user.getId())
+                agentRepository.findAgentByIdAndUserId(agentId, user.getId())
                                 .orElseThrow(AgentNotFoundException::new);
                 Dashboard dashboard = dashboardRepository.findById(dashboardId)
                                 .orElseThrow(DashboardNotFoundException::new);
