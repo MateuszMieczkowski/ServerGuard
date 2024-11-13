@@ -7,17 +7,16 @@ import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.security.core.GrantedAuthority;
 
-import java.io.Serializable;
-
 @Entity
 @SQLRestriction("is_deleted = false")
-public class UserResourceGroupPermission implements GrantedAuthority, Serializable {
+public class UserResourceGroupPermission implements GrantedAuthority {
 
-    public UserResourceGroupPermission() {}
+    public UserResourceGroupPermission() {
+    }
 
     public UserResourceGroupPermission(ResourceGroup resourceGroup,
-                                       User user,
-                                       ResourceGroupUserRole role) {
+            User user,
+            ResourceGroupUserRole role) {
         id = new UserResourceGroupPermissionPK(user.getId(), resourceGroup.getId());
         this.resourceGroup = resourceGroup;
         this.user = user;
@@ -44,10 +43,8 @@ public class UserResourceGroupPermission implements GrantedAuthority, Serializab
     @Column(nullable = false)
     private final boolean isDeleted = false;
 
-
     @Override
     public String getAuthority() {
         return String.format("resourceGroup_%s_%s", resourceGroup.getId(), role.toString());
     }
 }
-
