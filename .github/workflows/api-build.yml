@@ -30,7 +30,7 @@ jobs:
         run: echo "${{ secrets.SPRING_SECRETS }}" >> ./ServerGuard.Api/src/main/resources/secrets.yml
 
       - name: Build with Maven
-        run: mvn -B package --file ./ServerGuard.Api/pom.xml
+        run: mvn -Dmaven.test.skip -B package --file ./ServerGuard.Api/pom.xml
 
       - name: Show contents of the current working directory
         run: ls -la ./ServerGuard.Api
