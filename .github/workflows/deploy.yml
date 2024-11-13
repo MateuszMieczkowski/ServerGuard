@@ -18,7 +18,7 @@ jobs:
         run: chmod 400 ssh_key
 
       - name: Copy docker compose file to hetzner VM
-        run: scp -o StrictHostKeyChecking=no -i ./ssh_key ./docker-compose.yml ${{ secrets.HETZNER_USER }}@${{ secrets.HETZNER_IP }}:/home/${{ secrets.HETZNER_USER }}/deploy/docker-compose.yml
+        run: scp -o StrictHostKeyChecking=no -i ./ssh_key ./docker-compose.yml ${{ secrets.HETZNER_USER }}@${{ secrets.HETZNER_IP }}:/home/${{ secrets.HETZNER_USER }}/deploy/
 
       - name: Deploy to Hetzner VM
         run: ssh -o StrictHostKeyChecking=no -i ./ssh_key ${{ secrets.HETZNER_USER }}@${{ secrets.HETZNER_IP }} "bash -s ${{ secrets.DOCKERHUB_USERNAME }} ${{ secrets.DOCKERHUB_TOKEN }} ${{ secrets.PG_PASSWORD }} ${{ secrets.CLICKHOUSE_PASSWORD }}" < ./scripts/api-deploy.sh
