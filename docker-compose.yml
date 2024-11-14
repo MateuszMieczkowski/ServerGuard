@@ -4,11 +4,6 @@ services:
     ports:
     - "8080:8080"
     restart: always
-    depends_on:
-      serverguard.postgres:
-        condition: service_healthy
-      serverguard.clickhouse:
-        condition: service_healthy
 
   serverguard.web:
     image: mmieczkowski/serverguard-web:latest
