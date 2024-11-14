@@ -20,9 +20,10 @@ import java.time.Clock;
 @EnableJpaAuditing
 @EnableTransactionManagement
 @EnableScheduling
-@EnableConfigurationProperties({ClickHouseProperties.class, SmtpProperties.class})
+@EnableConfigurationProperties({ ClickHouseProperties.class, SmtpProperties.class })
 public class Config {
 
+    @SuppressWarnings("deprecation")
     @Bean
     public Client chDirectClient(ClickHouseProperties properties) {
         return new Client.Builder()
@@ -46,7 +47,7 @@ public class Config {
 
     @Bean
     public JavaMailSender mailSender(SmtpProperties properties) {
-        var mailSender = new  JavaMailSenderImpl();
+        var mailSender = new JavaMailSenderImpl();
         mailSender.setHost(properties.host());
         mailSender.setPort(properties.port());
         mailSender.setUsername(properties.username());
@@ -54,4 +55,3 @@ public class Config {
         return mailSender;
     }
 }
-
