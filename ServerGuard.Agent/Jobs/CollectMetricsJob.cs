@@ -34,6 +34,7 @@ internal sealed class CollectMetricsJob : IJob
         _logger.LogInformation("Collecting metrics...");
         var agentConfig = await _agentConfigProvider.GetAsync(context.CancellationToken);
         var metrics = await _metricCollector.CollectAsync();
+
         if (_configuration.GetValue<bool>("DebugMode"))
         {
             _logger.LogInformation("Metrics: {Metrics}", JsonSerializer.Serialize(metrics, new JsonSerializerOptions
