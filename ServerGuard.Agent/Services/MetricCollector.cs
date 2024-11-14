@@ -58,6 +58,10 @@ internal sealed class MetricCollector : IMetricCollector
 
     private static bool IsInvalidMetric(MetricType metricType, float? value)
     {
+        if (value is null)
+        {
+            return true;
+        }
         return (metricType == MetricType.Load && (value < 0 || value > 100)) ||
                             (metricType == MetricType.Temperature && (value < -50 || value > 200)) ||
                             (metricType == MetricType.Voltage && (value < 0 || value > 15)) ||
