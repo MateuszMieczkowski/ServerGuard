@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Check if the correct number of arguments are provided
-if [ "$#" -ne 2 ]; then
-    echo "Usage: $0 <docker_username> <docker_password>"
+if [ "$#" -ne 4 ]; then
+    echo "Usage: $0 <docker_username> <docker_password> <postgres_password> <clickhouse_password>"
     exit 1
 fi
 
