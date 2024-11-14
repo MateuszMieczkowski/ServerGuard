@@ -30,6 +30,6 @@ services:
      - ./volumes/clickhouse-data:/var/lib/clickhouse
      - ./volumes/clickhouse-logs:/var/log/clickhouse-server/
     environment:
-      CLICKHOUSE_PASSWORD: "CLICKHOUSE_PASSWORD"
+      CLICKHOUSE_PASSWORD: "{CLICKHOUSE_PASSWORD}"
       CLICKHOUSE_USER: "default"
     restart: always
