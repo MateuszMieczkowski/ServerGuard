@@ -5,9 +5,9 @@ services:
     - "8080:8080"
     restart: always
     depends_on:
-      - serviceName: serverguard.postgres
+      serverguard.postgres:
         condition: service_healthy
-      - serviceName: serverguard.clickhouse
+      serverguard.clickhouse:
         condition: service_healthy
 
   serverguard.web:
