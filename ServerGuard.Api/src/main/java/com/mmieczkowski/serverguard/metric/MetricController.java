@@ -2,6 +2,7 @@ package com.mmieczkowski.serverguard.metric;
 
 import com.mmieczkowski.serverguard.metric.request.SaveMetricsRequest;
 import com.mmieczkowski.serverguard.metric.response.GetAvailableMetricsResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +19,7 @@ public class MetricController {
     public void collectMetrics(@RequestHeader("x-api-key") String apiKey,
                                @PathVariable UUID resourceGroupId,
                                @PathVariable UUID agentId,
-                               @RequestBody SaveMetricsRequest saveMetricsRequest) {
+                               @RequestBody @Valid SaveMetricsRequest saveMetricsRequest) {
         metricService.collectMetrics(apiKey, saveMetricsRequest);
     }
 
