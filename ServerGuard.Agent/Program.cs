@@ -40,7 +40,6 @@ static void AddIntegrationApi(HostApplicationBuilder builder)
 {
     var serializerOptions = SystemTextJsonContentSerializer.GetDefaultJsonSerializerOptions();
     serializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals;
-    serializerOptions.Converters.Remove(serializerOptions.Converters.First(c => c is JsonStringEnumConverter));
     builder.Services
     .AddRefitClient<IIntegrationApi>(new RefitSettings()
     {
