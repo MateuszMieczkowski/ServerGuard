@@ -23,10 +23,10 @@ sed -i "s/{CLICKHOUSE_PASSWORD}/$CLICKHOUSE_PASSWORD/g" docker-compose.yml
 
 
 # Stop and remove existing Docker Compose services
-docker-compose down
+docker compose down
 
 # Pull the latest images (optional, if you want to ensure you have the latest images)
-docker-compose pull
+docker compose pull
 
 # Start a new Docker Compose setup
-docker-compose up -d
+docker compose up -d
