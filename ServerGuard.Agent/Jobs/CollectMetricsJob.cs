@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Quartz;
@@ -33,6 +34,13 @@ internal sealed class CollectMetricsJob : IJob
         _logger.LogInformation("Collecting metrics...");
         var agentConfig = await _agentConfigProvider.GetAsync(context.CancellationToken);
         var metrics = await _metricCollector.CollectAsync();
+        if (_configuration.GetValue<bool>("DebugMode"))
+        {
+            _logger.LogInformation("Metrics: {Metrics}", JsonSerializer.Serialize(metrics, new JsonSerializerOptions
+            {
+                NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals
+            }));
+        }
         await _integrationApi.SendMetrics(_configuration.GetValue<string>("ApiKey"), agentConfig.ResourceGroupId, agentConfig.AgentId, metrics, context.CancellationToken);
         _logger.LogInformation("Metrics collected");
         await Task.Delay(TimeSpan.FromSeconds(agentConfig.CollectEverySeconds), context.CancellationToken);
