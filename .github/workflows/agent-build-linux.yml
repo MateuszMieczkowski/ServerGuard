@@ -25,7 +25,7 @@ jobs:
         working-directory: ./ServerGuard.Agent
 
       - name: Publish
-        run: dotnet publish -c Release -o ./publish
+        run: dotnet publish -c Release --self-contained -o ./publish
         working-directory: ./ServerGuard.Agent
 
       - name: Upload build artifact
