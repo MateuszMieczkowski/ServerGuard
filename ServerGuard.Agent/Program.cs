@@ -7,12 +7,23 @@ using ServerGuard.Agent.Services;
 using ServerGuard.Agent.Config;
 using Refit;
 using Microsoft.Extensions.Configuration;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
-var builder = Host.CreateApplicationBuilder();
+HostApplicationBuilder builder = Host.CreateApplicationBuilder();
 
-builder.Services.AddSerilog((_, config) => config.ReadFrom.Configuration(builder.Configuration));
+builder.Services.AddSerilog((_, config) =>
+{
+    config.ReadFrom.Configuration(builder.Configuration);
+    if (builder.Configuration.GetValue<bool>("DebugMode"))
+    {
+        config.MinimumLevel.Debug();
+        config.WriteTo.Console();
+    }
+    else
+    {
+        config.MinimumLevel.Information();
+    }
+});
 
 if (!RootChecker.IsRoot())
 {
@@ -45,7 +56,7 @@ static void AddIntegrationApi(HostApplicationBuilder builder)
     {
         ContentSerializer = new SystemTextJsonContentSerializer(serializerOptions),
     })
-     .ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.Configuration.GetConnectionString("ApiUrl")));
+     .ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.Configuration.GetConnectionString("ApiUrl")!));
 }
 
 static void AddQuartz(HostApplicationBuilder builder)
