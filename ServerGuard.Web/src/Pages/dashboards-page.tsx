@@ -182,6 +182,7 @@ const DashboardsPage = () => {
       getDashboards(resourceGroupId, agentId).then((response) => {
         setDashboards(response);
       });
+      setLoading(false);
     } else {
       setLoading(false);
     }
