@@ -42,7 +42,7 @@ internal sealed class CollectMetricsJob : IJob
                 NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals
             }));
         }
-        await _integrationApi.SendMetrics(_configuration.GetValue<string>("ApiKey"), agentConfig.ResourceGroupId, agentConfig.AgentId, metrics, context.CancellationToken);
+        await _integrationApi.SendMetrics(_configuration.GetValue<string>("ApiKey")!, agentConfig.ResourceGroupId, agentConfig.AgentId, metrics, context.CancellationToken);
         _logger.LogInformation("Metrics collected");
         await Task.Delay(TimeSpan.FromSeconds(agentConfig.CollectEverySeconds), context.CancellationToken);
     }
