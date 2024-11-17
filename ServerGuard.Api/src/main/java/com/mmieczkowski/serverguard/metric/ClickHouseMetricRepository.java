@@ -42,7 +42,7 @@ public class ClickHouseMetricRepository implements MetricRepository {
 
     @Override
     public List<AvailableMetric> findAvailableMetricsByAgentId(UUID agentId) {
-        String query = String.format("SELECT distinct m.sensor_name, m.metric_name, m.type FROM metric m WHERE agent_id = '%s'", agentId.toString());
+        String query = String.format("SELECT * FROM available_metric m WHERE agent_id = '%s'", agentId.toString());
         CompletableFuture<Records> responseCompletableFuture = client.queryRecords(query);
         try(Records queryResponse = responseCompletableFuture.get(3, TimeUnit.SECONDS)) {
             if(queryResponse.getResultRows() == 0) {
@@ -53,7 +53,7 @@ public class ClickHouseMetricRepository implements MetricRepository {
                 String sensorName = reader.getString("sensor_name");
                 String metricName = reader.getString("metric_name");
                 int type = reader.getInteger("type");
-                var availableMetric = new AvailableMetric(sensorName, metricName, MetricType.values()[type - 1]);
+                var availableMetric = new AvailableMetric(agentId, sensorName, metricName, MetricType.values()[type - 1]);
                 availableMetrics.add(availableMetric);
             });
             return availableMetrics;
@@ -194,6 +194,11 @@ public class ClickHouseMetricRepository implements MetricRepository {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void saveAvailableMetrics(UUID agentId, List<AvailableMetric> availableMetrics) {
+        client.insert("available_metric", availableMetrics);
     }
 
     private String toClickHouseDateTimeFormat(LocalDateTime dateTime) {

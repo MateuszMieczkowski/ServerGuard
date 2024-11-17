@@ -38,4 +38,6 @@ public interface MetricRepository {
                                        MetricType metricType,
                                        Duration fromNow,
                                        String aggregateFunction);
+
+    void saveAvailableMetrics(UUID agentId, List<AvailableMetric> availableMetrics);
 }
