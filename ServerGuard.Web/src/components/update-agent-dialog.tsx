@@ -19,9 +19,12 @@ import * as Yup from "yup";
 import {
   AgentDetails,
   CreateAgentRequest,
+  deleteAgent,
   getAgent,
   updateAgent,
 } from "../api/agents-service";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { deleteConfirmationDialog } from "./delete-confirmation-dialog";
 
 interface UpdateAgentDialogProps {
   resourceGroupId: string;
@@ -61,6 +64,7 @@ export const UpdateAgentDialog: React.FC<UpdateAgentDialogProps> = ({
   const [loading, setLoading] = React.useState(false);
 
   const [apiKeyInputType, setApiKeyInputType] = React.useState("password");
+  const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
 
   useEffect(() => {
     if (open) {
@@ -125,6 +129,10 @@ export const UpdateAgentDialog: React.FC<UpdateAgentDialogProps> = ({
     },
     validateOnChange: false,
   });
+
+  function handleDeleteAgentButtonClick(): void {
+    setOpenDeleteDialog(true);
+  }
 
   return (
     <Dialog
@@ -284,6 +292,12 @@ export const UpdateAgentDialog: React.FC<UpdateAgentDialogProps> = ({
           </FormGroup>
           <DialogActions>
             <Button
+              startIcon={<DeleteIcon />}
+              onClick={handleDeleteAgentButtonClick}
+            >
+              Delete
+            </Button>
+            <Button
               color="primary"
               disabled={formik.isSubmitting}
               onClick={handleClose}
@@ -299,6 +313,16 @@ export const UpdateAgentDialog: React.FC<UpdateAgentDialogProps> = ({
             </Button>
           </DialogActions>
         </DialogContent>
+      )}
+      {deleteConfirmationDialog(
+        "Agent",
+        openDeleteDialog,
+        () => setOpenDeleteDialog(false),
+        async () => {
+          await deleteAgent(resourceGroupId, agent.id);
+          onUpdate();
+          handleClose();
+        }
       )}
     </Dialog>
   );

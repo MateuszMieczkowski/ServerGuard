@@ -142,3 +142,22 @@ export const getAgent = async (resourceGroupId: string, agentId: string) : Promi
         throw error;
     }
 }
+
+
+export const deleteAgent = async (resourceGroupId: string, agentId: string) => {
+    try {
+        const response = await axiosInstance.delete(`${config.apiUrl}/resourceGroups/${resourceGroupId}/agents/${agentId}`, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.status !== 200) {
+            throw new Error('Failed to delete agent');
+        }
+        return;
+    } catch (error) {
+        console.error("Failed to delete agent", error);
+        throw error;
+    }
+}
