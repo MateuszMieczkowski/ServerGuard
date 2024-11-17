@@ -11,7 +11,7 @@ import com.mmieczkowski.serverguard.alert.response.GetAlertLogsPageResponse;
 import com.mmieczkowski.serverguard.alert.response.GetAlertsPageResponse;
 import com.mmieczkowski.serverguard.resourcegroup.exception.ResourceGroupNotFoundException;
 import com.mmieczkowski.serverguard.service.UserService;
-import com.mmieczkowski.serverguard.user.User;
+import com.mmieczkowski.serverguard.user.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -27,7 +27,10 @@ public class AlertService {
     private final AlertRepository alertRepository;
     private final AlertLogRepository alertLogRepository;
 
-    public AlertService(AgentRepository agentRepository, UserService userService, AlertRepository alertRepository, AlertLogRepository alertLogRepository) {
+    public AlertService(AgentRepository agentRepository,
+                        UserService userService,
+                        AlertRepository alertRepository,
+                        AlertLogRepository alertLogRepository) {
         this.agentRepository = agentRepository;
         this.userService = userService;
         this.alertRepository = alertRepository;

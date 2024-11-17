@@ -1,7 +1,7 @@
 package com.mmieczkowski.serverguard.service;
 
-import com.mmieczkowski.serverguard.user.User;
-import com.mmieczkowski.serverguard.user.UserRepository;
+import com.mmieczkowski.serverguard.user.model.User;
+import com.mmieczkowski.serverguard.user.repository.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;

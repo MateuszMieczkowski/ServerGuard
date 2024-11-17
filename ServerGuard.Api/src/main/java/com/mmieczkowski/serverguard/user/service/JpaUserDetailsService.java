@@ -1,6 +1,6 @@
-package com.mmieczkowski.serverguard.auth;
+package com.mmieczkowski.serverguard.user.service;
 
-import com.mmieczkowski.serverguard.user.UserRepository;
+import com.mmieczkowski.serverguard.user.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

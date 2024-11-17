@@ -1,10 +1,12 @@
-package com.mmieczkowski.serverguard.user;
+package com.mmieczkowski.serverguard.user.model;
 
 import com.mmieczkowski.serverguard.resourcegroup.model.UserResourceGroupPermission;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.Clock;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +27,9 @@ public class User implements UserDetails {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
     private List<UserResourceGroupPermission> permissions;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<ResetPasswordLink> resetPasswordLinks;
 
     public User() {
     }
@@ -56,5 +61,22 @@ public class User implements UserDetails {
 
     public UUID getId() {
         return this.id;
+    }
+
+    public ResetPasswordLink createResetPasswordLink(Clock clock) {
+        ResetPasswordLink resetPasswordLink = new ResetPasswordLink(this, clock);
+        resetPasswordLinks.add(resetPasswordLink);
+        return resetPasswordLink;
+    }
+
+    public void setPassword(String newPassword) {
+        this.password = newPassword;
+    }
+
+    public void markResetPasswordLinkAsUsed(String token, Clock clock) {
+        resetPasswordLinks.stream()
+                .filter(link -> link.getToken().equals(token))
+                .findFirst()
+                .ifPresent(x -> x.markAsUsed(clock));
     }
 }

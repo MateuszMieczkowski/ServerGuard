@@ -39,3 +39,6 @@ smtp:
 logging:
   level:
     clickhouse: DEBUG
+
+web:
+  url: http://65.109.225.191

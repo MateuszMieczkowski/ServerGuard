@@ -1,4 +1,4 @@
-package com.mmieczkowski.serverguard.auth.request;
+package com.mmieczkowski.serverguard.user.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

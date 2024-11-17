@@ -1,4 +1,4 @@
-package com.mmieczkowski.serverguard.auth;
+package com.mmieczkowski.serverguard.user.service;
 
 import org.springframework.security.core.Authentication;
 

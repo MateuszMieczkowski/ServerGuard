@@ -1,4 +1,4 @@
-package com.mmieczkowski.serverguard.service;
+package com.mmieczkowski.serverguard.email;
 
 import java.io.IOException;
 

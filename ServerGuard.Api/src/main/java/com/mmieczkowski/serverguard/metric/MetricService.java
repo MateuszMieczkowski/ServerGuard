@@ -10,7 +10,7 @@ import com.mmieczkowski.serverguard.metric.request.SaveMetricsRequest;
 import com.mmieczkowski.serverguard.metric.response.GetAvailableMetricsResponse;
 import com.mmieczkowski.serverguard.resourcegroup.exception.ResourceGroupNotFoundException;
 import com.mmieczkowski.serverguard.service.UserService;
-import com.mmieczkowski.serverguard.user.User;
+import com.mmieczkowski.serverguard.user.model.User;
 import org.slf4j.Logger;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.BadCredentialsException;

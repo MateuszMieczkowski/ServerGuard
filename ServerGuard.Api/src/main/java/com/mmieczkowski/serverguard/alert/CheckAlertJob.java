@@ -2,21 +2,17 @@ package com.mmieczkowski.serverguard.alert;
 
 import com.mmieczkowski.serverguard.alert.model.Alert;
 import com.mmieczkowski.serverguard.alert.model.AlertLog;
-import com.mmieczkowski.serverguard.alert.model.AlertMetric;
+import com.mmieczkowski.serverguard.email.EmailService;
+import com.mmieczkowski.serverguard.email.definitions.AlertEmail;
 import com.mmieczkowski.serverguard.metric.MetricRepository;
 import com.mmieczkowski.serverguard.resourcegroup.ResourceGroupRepository;
-import com.mmieczkowski.serverguard.service.EmailTemplateProvider;
 import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.time.Clock;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,23 +21,27 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class CheckAlertJob {
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(CheckAlertJob.class);
+    private static final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
+
     private final AlertRepository alertRepository;
     private final MetricRepository metricRepository;
     private final AlertLogRepository alertLogRepository;
     private final ResourceGroupRepository resourceGroupRepository;
     private final Clock clock;
-    private final EmailTemplateProvider emailTemplateProvider;
-    private final JavaMailSender mailSender;
-    private static final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
+    private final EmailService emailService;
 
-    public CheckAlertJob(AlertRepository alertRepository, MetricRepository metricRepository, AlertLogRepository alertLogRepository, ResourceGroupRepository resourceGroupRepository, Clock clock, EmailTemplateProvider emailTemplateProvider, JavaMailSender mailSender) {
+    public CheckAlertJob(AlertRepository alertRepository,
+                         MetricRepository metricRepository,
+                         AlertLogRepository alertLogRepository,
+                         ResourceGroupRepository resourceGroupRepository,
+                         Clock clock,
+                         EmailService emailService) {
         this.alertRepository = alertRepository;
         this.metricRepository = metricRepository;
         this.alertLogRepository = alertLogRepository;
         this.resourceGroupRepository = resourceGroupRepository;
         this.clock = clock;
-        this.emailTemplateProvider = emailTemplateProvider;
-        this.mailSender = mailSender;
+        this.emailService = emailService;
     }
 
     @Scheduled(fixedRate = 1, timeUnit = TimeUnit.MINUTES)
@@ -92,38 +92,14 @@ public class CheckAlertJob {
         executorService.submit(() -> {
             try {
                 sendEmail(alertLog, recipientEmails.toArray(new String[0]));
-            } catch (MessagingException e) {
+            } catch (MessagingException | IOException e) {
                 log.error("Error sending email for alertLog with id: {}", alertLog.getId(), e);
             }
         });
     }
 
-    private void sendEmail(AlertLog alertLog, String[] emails) throws MessagingException {
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
-        helper.setTo(emails);
-        helper.setSubject("Alert Triggered");
-        helper.setText(GetFilledTemplate(alertLog), true);
-        mailSender.send(mimeMessage);
-    }
-
-    private String GetFilledTemplate(AlertLog alertLog) {
-        final String templateName = "alertEmailTemplate.html";
-        try {
-            var template = emailTemplateProvider.getTemplate(templateName);
-            template = template.replace("{{alertName}}", alertLog.getAlertName());
-            template = template.replace("{{agent.name}}", alertLog.getAgent().getName());
-            template = template.replace("{{triggeredAt}}", LocalDateTime.ofInstant(alertLog.getTriggeredAt(), ZoneId.of("UTC")).toString());
-            AlertMetric metric = alertLog.getMetric();
-            template = template.replace("{{metric}}", String.format("%s %s %s", metric.getSensorName(), metric.getMetricName(), metric.getType()));
-            template = template.replace("{{when}}", alertLog.getWhen().getOperator().getOperator());
-            template = template.replace("{{groupBy}}", alertLog.getGroupBy().getAggregateFunction());
-            template = template.replace("{{threshold}}", String.valueOf(alertLog.getWhen().getThreshold()));
-            template = template.replace("{{triggeredByValue}}", String.valueOf(alertLog.getTriggeredByValue()));
-            return template;
-        } catch (Exception e) {
-            log.error("Error getting template {}", templateName, e);
-            return "";
-        }
+    private void sendEmail(AlertLog alertLog, String[] emails) throws MessagingException, IOException {
+        var alertEmail = new AlertEmail(emails, alertLog);
+        emailService.sendEmail(alertEmail);
     }
 }

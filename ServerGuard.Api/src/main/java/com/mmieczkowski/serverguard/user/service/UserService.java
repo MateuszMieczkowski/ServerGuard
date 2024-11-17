@@ -1,11 +1,11 @@
-package com.mmieczkowski.serverguard.auth;
+package com.mmieczkowski.serverguard.user.service;
 
-import com.mmieczkowski.serverguard.auth.request.LoginRequest;
-import com.mmieczkowski.serverguard.auth.response.LoginResponse;
-import com.mmieczkowski.serverguard.auth.request.RegisterRequest;
-import com.mmieczkowski.serverguard.auth.response.RegisterResponse;
-import com.mmieczkowski.serverguard.user.User;
-import com.mmieczkowski.serverguard.user.UserRepository;
+import com.mmieczkowski.serverguard.user.repository.UserRepository;
+import com.mmieczkowski.serverguard.user.request.LoginRequest;
+import com.mmieczkowski.serverguard.user.response.LoginResponse;
+import com.mmieczkowski.serverguard.user.request.RegisterRequest;
+import com.mmieczkowski.serverguard.user.response.RegisterResponse;
+import com.mmieczkowski.serverguard.user.model.User;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,15 +14,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
+
 @Service
-public class AuthService {
+public class UserService {
 
     private final AuthTokenService authTokenService;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
-    public AuthService(
+    public UserService(
             AuthTokenService authTokenService,
             AuthenticationManager authenticationManager,
             PasswordEncoder passwordEncoder,

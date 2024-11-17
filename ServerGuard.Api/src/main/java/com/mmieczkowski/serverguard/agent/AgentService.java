@@ -14,7 +14,7 @@ import com.mmieczkowski.serverguard.resourcegroup.ResourceGroupRepository;
 import com.mmieczkowski.serverguard.resourcegroup.exception.ResourceGroupNotFoundException;
 import com.mmieczkowski.serverguard.service.SecureRandomString;
 import com.mmieczkowski.serverguard.service.UserService;
-import com.mmieczkowski.serverguard.user.User;
+import com.mmieczkowski.serverguard.user.model.User;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;

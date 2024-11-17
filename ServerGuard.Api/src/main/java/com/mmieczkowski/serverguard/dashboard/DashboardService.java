@@ -16,7 +16,7 @@ import com.mmieczkowski.serverguard.dashboard.response.GetGraphDataResponse;
 import com.mmieczkowski.serverguard.metric.MetricRepository;
 import com.mmieczkowski.serverguard.resourcegroup.exception.ResourceGroupNotFoundException;
 import com.mmieczkowski.serverguard.service.UserService;
-import com.mmieczkowski.serverguard.user.User;
+import com.mmieczkowski.serverguard.user.model.User;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;

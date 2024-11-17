@@ -1,4 +1,4 @@
-package com.mmieczkowski.serverguard.auth.response;
+package com.mmieczkowski.serverguard.user.response;
 
 public record RegisterResponse(boolean success) {
 }

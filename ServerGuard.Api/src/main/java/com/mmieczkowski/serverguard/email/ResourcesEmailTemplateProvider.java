@@ -1,4 +1,4 @@
-package com.mmieczkowski.serverguard.service;
+package com.mmieczkowski.serverguard.email;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -10,6 +10,6 @@ import java.nio.charset.Charset;
 public class ResourcesEmailTemplateProvider implements EmailTemplateProvider {
     @Override
     public String getTemplate(String templateName) throws IOException {
-        return new ClassPathResource("templates/" + templateName).getContentAsString(Charset.defaultCharset());
+        return new ClassPathResource("templates/" + templateName + ".html").getContentAsString(Charset.defaultCharset());
     }
 }

@@ -3,6 +3,7 @@ package com.mmieczkowski.serverguard.config;
 import com.clickhouse.client.api.Client;
 import com.mmieczkowski.serverguard.config.properties.ClickHouseProperties;
 import com.mmieczkowski.serverguard.config.properties.SmtpProperties;
+import com.mmieczkowski.serverguard.config.properties.WebProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +21,7 @@ import java.time.Clock;
 @EnableJpaAuditing
 @EnableTransactionManagement
 @EnableScheduling
-@EnableConfigurationProperties({ ClickHouseProperties.class, SmtpProperties.class })
+@EnableConfigurationProperties({ ClickHouseProperties.class, SmtpProperties.class, WebProperties.class })
 public class Config {
 
     @SuppressWarnings("deprecation")
