@@ -11,3 +11,7 @@
 5. Implement Users list and invitation to resource group
 
 6. Add live mode to dashboard page
+
+7. Fix copy api key in agent settings
+
+8. Add remove resource group feature
