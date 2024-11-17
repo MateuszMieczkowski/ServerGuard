@@ -1,0 +1,35 @@
+name: Serverguard Agent build windows
+
+on:
+  push:
+    branches: ["master"]
+    paths: ["ServerGuard.Agent/**"]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+        working-directory: ./ServerGuard.Agent
+
+      - name: Build
+        run: dotnet build --no-restore
+        working-directory: ./ServerGuard.Agent
+
+      - name: Publish
+        run: dotnet publish -c Release --self-contained -o ./publish
+        working-directory: ./ServerGuard.Agent
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4.4.3
+        with:
+          name: agent
+          path: ./ServerGuard.Agent/publish
