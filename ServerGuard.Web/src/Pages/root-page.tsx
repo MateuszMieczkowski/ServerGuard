@@ -26,11 +26,11 @@ import {
   getResourceGroups,
   GetResourceGroupsResponse,
 } from "../api/resource-group-service";
+import { isAuthenticated } from "../util";
 
 const drawerWidth = 240;
 
 const RootPage = () => {
-  const isAuthenticated = localStorage.getItem("authToken") !== null;
   const [openCreateResourceGroupDialog, setOpenCreateResourceGroupDialog] =
     useState(false);
   const [refreshResourceGroups, setrefreshResourceGroups] = useState(false);
@@ -67,7 +67,7 @@ const RootPage = () => {
     navigate(`/resourceGroups/${resourceGroupId}/agents`);
   };
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated()) {
     navigate("/sign-in");
   }
 

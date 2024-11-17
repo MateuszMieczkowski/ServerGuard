@@ -484,6 +484,7 @@ const DashboardsPage = () => {
                             stroke={graph.lineColor}
                             strokeWidth={2}
                             dot={false}
+                            isAnimationActive={!liveMode}
                           />
                         </LineChart>
                       </ResponsiveContainer>
