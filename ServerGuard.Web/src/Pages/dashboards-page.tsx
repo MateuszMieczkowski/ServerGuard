@@ -80,12 +80,12 @@ const DashboardsPage = () => {
 
   const [deleteConfirmation, setDeleteConfirmation] = useState(false);
 
-  //TODO: SEt to false
   const [liveMode, setLiveMode] = useState(false);
-  const [_, setStompSubscriptions] = useState<StompSubscription[]>([]);
+  const [stompSubscriptions, setStompSubscriptions] = useState<
+    StompSubscription[]
+  >([]);
   const [liveModeMetrics, setLiveModeMetrics] = useState<WsMetrics[]>([]);
 
-  //TODO: set url from config
   const [stompClient] = useState<Client>(() => {
     var client = new Client({
       brokerURL: config.webSocketUrl,
@@ -115,17 +115,31 @@ const DashboardsPage = () => {
 
   useEffect(() => {
     if (!liveMode) {
+      setLiveModeMetrics([]);
+      if (stompClient.connected) {
+        stompSubscriptions.forEach((subscription) => {
+          stompClient.unsubscribe(subscription.id);
+        });
+        setStompSubscriptions([]);
+      }
       return;
     }
     if (agentId) {
+      if (
+        stompSubscriptions.some(
+          (subscription) =>
+            subscription.id === `/topic/agents/${agentId}/metrics`
+        )
+      ) {
+        return;
+      }
       const subscripion = stompClient.subscribe(
         `/topic/agents/${agentId}/metrics`,
         (message) => {
-          if (liveMode) {
-            const wsMetrics: WsMetrics = JSON.parse(message.body);
-            setLiveModeMetrics((prevState) => [...prevState, wsMetrics]);
-          }
-        }
+          const wsMetrics: WsMetrics = JSON.parse(message.body);
+          setLiveModeMetrics((prevState) => [...prevState, wsMetrics]);
+        },
+        { id: `/topic/agents/${agentId}/metrics` }
       );
       setStompSubscriptions((prevState) => [...prevState, subscripion]);
     }
@@ -135,22 +149,28 @@ const DashboardsPage = () => {
     if (!liveMode) {
       return;
     }
-    // if (liveModeMetrics.length > 0) {
-    //   selectedDashboard?.graphs.forEach((graph, _) => {
-    //     const metrics = liveModeMetrics.filter((wsMetric) => {
-    //       wsMetric.sensorMetrics.forEach((sensorMetric) => {
-    //         if (
-    //           sensorMetric.name === graph.sensorName &&
-    //           sensorMetric.metrics.some(
-    //             (metric) => metric.name === graph.metricName
-    //           )
-    //         ) {
-    //           return true;
-    //         }
-    //       });
-    //     });
-    //   });
-    // }
+    if (liveModeMetrics.length > 0) {
+      selectedDashboard?.graphs.forEach((graph, _) => {
+        const data = liveModeMetrics.map((metric) => {
+          const sensorMetric = metric.sensorMetrics.find(
+            (sensorMetric) => sensorMetric.name === graph.sensorName
+          );
+          const metricValue = sensorMetric?.metrics.find(
+            (metric) =>
+              metric.name === graph.metricName &&
+              metric.type === graph.metricType
+          );
+          return {
+            time: metric.time,
+            value: metricValue?.value || 0,
+          };
+        });
+        setGraphData((prevState) => ({
+          ...prevState,
+          [graph.index]: data,
+        }));
+      });
+    }
   }, [liveModeMetrics]);
 
   useEffect(() => {
@@ -201,8 +221,8 @@ const DashboardsPage = () => {
       resourceGroupId as string,
       agentId as string,
       selectedDashboardId as string,
-      dataFrom.toISOString().replace("Z", ""),
-      dataTo.toISOString().replace("Z", ""),
+      dataFrom.toISOString(),
+      dataTo.toISOString(),
       graphIndex,
       200,
       aggretationType
@@ -432,7 +452,10 @@ const DashboardsPage = () => {
                           />
                           <YAxis
                             type="number"
-                            domain={["auto", "auto"]}
+                            domain={[
+                              (dataMin: any) => dataMin,
+                              (dataMax: any) => dataMax * 1.1,
+                            ]}
                             tickCount={10}
                             unit={graph.unit}
                           />

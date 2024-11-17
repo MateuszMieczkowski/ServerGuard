@@ -2,12 +2,12 @@ package com.mmieczkowski.serverguard.dashboard.request;
 
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public record GetGraphDataRequest(
         @NotNull int maxDataPoints,
-        @NotNull LocalDateTime from,
-        @NotNull LocalDateTime to,
+        @NotNull Instant from,
+        @NotNull Instant to,
         @NotNull String aggregationType
 ) {
 }

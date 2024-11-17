@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -102,7 +103,7 @@ public class ClickHouseMetricRepository implements MetricRepository {
             List<DataPoint> dataPoints = new ArrayList<>();
             while (reader.hasNext()) {
                 reader.next();
-                DataPoint dataPoint = new DataPoint(reader.getLocalDateTime(1), reader.getDouble(2));
+                DataPoint dataPoint = new DataPoint(reader.getLocalDateTime(1).toInstant(ZoneOffset.UTC), reader.getDouble(2));
                 dataPoints.add(dataPoint);
             }
             return dataPoints;
@@ -150,7 +151,7 @@ public class ClickHouseMetricRepository implements MetricRepository {
             List<DataPoint> dataPoints = new ArrayList<>();
             while (reader.hasNext()) {
                 reader.next();
-                DataPoint dataPoint = new DataPoint(reader.getLocalDateTime(1), reader.getDouble(2));
+                DataPoint dataPoint = new DataPoint(reader.getLocalDateTime(1).toInstant(ZoneOffset.UTC), reader.getDouble(2));
                 dataPoints.add(dataPoint);
             }
             return dataPoints;

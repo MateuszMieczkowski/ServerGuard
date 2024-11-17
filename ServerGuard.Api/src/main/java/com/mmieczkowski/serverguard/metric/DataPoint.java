@@ -1,6 +1,6 @@
 package com.mmieczkowski.serverguard.metric;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
-public record DataPoint(LocalDateTime time, double value) {
+public record DataPoint(Instant time, double value) {
 }
