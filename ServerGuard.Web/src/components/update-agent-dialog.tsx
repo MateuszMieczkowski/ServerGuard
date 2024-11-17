@@ -13,6 +13,7 @@ import {
   FormControlLabel,
   CircularProgress,
   Box,
+  IconButton,
 } from "@mui/material";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -25,6 +26,7 @@ import {
 } from "../api/agents-service";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { deleteConfirmationDialog } from "./delete-confirmation-dialog";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 interface UpdateAgentDialogProps {
   resourceGroupId: string;
@@ -134,6 +136,10 @@ export const UpdateAgentDialog: React.FC<UpdateAgentDialogProps> = ({
     setOpenDeleteDialog(true);
   }
 
+  function handleCopyApiKeyButtonClick(): void {
+    navigator.clipboard.writeText(agent.config.apiKey);
+  }
+
   return (
     <Dialog
       open={open}
@@ -194,20 +200,26 @@ export const UpdateAgentDialog: React.FC<UpdateAgentDialogProps> = ({
               formik.errors.collectEverySeconds
             }
           />
-          <Typography
-            variant="body1"
-            id="apiKey"
-            onClick={() => {
-              if (apiKeyInputType === "password") {
-                setApiKeyInputType("text");
-              } else {
-                setApiKeyInputType("password");
-              }
-            }}
-          >
-            Api key (Click): {apiKeyInputType === "text" && agent.config.apiKey}
-            {apiKeyInputType === "password" &&
-              agent.config.apiKey.replace(/./g, "X")}
+          <Typography variant="body1" id="apiKey">
+            Api Key
+            <IconButton onClick={handleCopyApiKeyButtonClick}>
+              <ContentCopyIcon />
+            </IconButton>
+            <Typography
+              variant="body1"
+              id="apiKey-value"
+              onClick={() => {
+                if (apiKeyInputType === "password") {
+                  setApiKeyInputType("text");
+                } else {
+                  setApiKeyInputType("password");
+                }
+              }}
+            >
+              {apiKeyInputType === "text" && agent.config.apiKey}{" "}
+              {apiKeyInputType === "password" &&
+                agent.config.apiKey.replace(/./g, "X")}
+            </Typography>
           </Typography>
           <Divider sx={{ my: 2 }} />
           <Typography variant="h6">Enabled metrics</Typography>
