@@ -2,7 +2,6 @@ package com.mmieczkowski.serverguard.dashboard.model;
 
 import com.mmieczkowski.serverguard.agent.model.Agent;
 import jakarta.persistence.*;
-import lombok.Getter;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.util.Assert;
 
@@ -15,11 +14,9 @@ import java.util.stream.Stream;
 public class Dashboard {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Getter
     private UUID id;
 
     @Column(nullable = false)
-    @Getter
     private String name;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "dashboard")
@@ -63,4 +60,11 @@ public class Dashboard {
         graphs.add(graph);
     }
 
+    public UUID getId() {
+        return this.id;
+    }
+
+    public String getName() {
+        return this.name;
+    }
 }

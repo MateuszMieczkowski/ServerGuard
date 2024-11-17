@@ -12,7 +12,6 @@ import com.mmieczkowski.serverguard.alert.response.GetAlertsPageResponse;
 import com.mmieczkowski.serverguard.resourcegroup.exception.ResourceGroupNotFoundException;
 import com.mmieczkowski.serverguard.service.UserService;
 import com.mmieczkowski.serverguard.user.User;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -22,12 +21,18 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class AlertService {
     private final AgentRepository agentRepository;
     private final UserService userService;
     private final AlertRepository alertRepository;
     private final AlertLogRepository alertLogRepository;
+
+    public AlertService(AgentRepository agentRepository, UserService userService, AlertRepository alertRepository, AlertLogRepository alertLogRepository) {
+        this.agentRepository = agentRepository;
+        this.userService = userService;
+        this.alertRepository = alertRepository;
+        this.alertLogRepository = alertLogRepository;
+    }
 
     public void createAlert(UUID resourceGroupId, UUID agentId, CreateAlertRequest request) {
         User user = userService.getLoggedInUser()

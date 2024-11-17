@@ -2,7 +2,6 @@ package com.mmieczkowski.serverguard.user;
 
 import com.mmieczkowski.serverguard.resourcegroup.model.UserResourceGroupPermission;
 import jakarta.persistence.*;
-import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -14,7 +13,6 @@ import java.util.UUID;
 @Table(name = "app_user")
 public class User implements UserDetails {
 
-    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -54,5 +52,9 @@ public class User implements UserDetails {
     public boolean hasAccessToResourceGroup(UUID resourceGroupId) {
         return permissions.stream()
                 .anyMatch(permission -> permission.getResourceGroup().getId().equals(resourceGroupId));
+    }
+
+    public UUID getId() {
+        return this.id;
     }
 }

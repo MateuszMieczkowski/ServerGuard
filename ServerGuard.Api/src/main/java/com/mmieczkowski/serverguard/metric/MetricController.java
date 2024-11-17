@@ -3,17 +3,19 @@ package com.mmieczkowski.serverguard.metric;
 import com.mmieczkowski.serverguard.metric.request.SaveMetricsRequest;
 import com.mmieczkowski.serverguard.metric.response.GetAvailableMetricsResponse;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/resourceGroups/{resourceGroupId}/agents/{agentId}/metrics")
 public class MetricController {
 
     private final MetricService metricService;
+
+    public MetricController(MetricService metricService) {
+        this.metricService = metricService;
+    }
 
     @PostMapping
     public void collectMetrics(@RequestHeader("x-api-key") String apiKey,

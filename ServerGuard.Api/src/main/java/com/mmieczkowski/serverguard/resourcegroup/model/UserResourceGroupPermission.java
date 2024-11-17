@@ -2,8 +2,6 @@ package com.mmieczkowski.serverguard.resourcegroup.model;
 
 import com.mmieczkowski.serverguard.user.User;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -15,8 +13,8 @@ public class UserResourceGroupPermission implements GrantedAuthority {
     }
 
     public UserResourceGroupPermission(ResourceGroup resourceGroup,
-            User user,
-            ResourceGroupUserRole role) {
+                                       User user,
+                                       ResourceGroupUserRole role) {
         id = new UserResourceGroupPermissionPK(user.getId(), resourceGroup.getId());
         this.resourceGroup = resourceGroup;
         this.user = user;
@@ -30,8 +28,6 @@ public class UserResourceGroupPermission implements GrantedAuthority {
     @MapsId("userId")
     private User user;
 
-    @Setter
-    @Getter
     @ManyToOne
     @MapsId("resourceGroupId")
     private ResourceGroup resourceGroup;
@@ -46,5 +42,13 @@ public class UserResourceGroupPermission implements GrantedAuthority {
     @Override
     public String getAuthority() {
         return String.format("resourceGroup_%s_%s", resourceGroup.getId(), role.toString());
+    }
+
+    public ResourceGroup getResourceGroup() {
+        return this.resourceGroup;
+    }
+
+    public void setResourceGroup(ResourceGroup resourceGroup) {
+        this.resourceGroup = resourceGroup;
     }
 }

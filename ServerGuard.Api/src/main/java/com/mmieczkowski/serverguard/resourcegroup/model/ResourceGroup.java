@@ -1,7 +1,6 @@
 package com.mmieczkowski.serverguard.resourcegroup.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -17,12 +16,10 @@ import java.util.UUID;
 @SQLRestriction("is_deleted = false")
 public class ResourceGroup {
 
-    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Getter
     @Column(nullable = false)
     private String name;
 
@@ -38,7 +35,9 @@ public class ResourceGroup {
     @Column(nullable = false)
     private final boolean isDeleted = false;
 
-    public ResourceGroup() {}
+    public ResourceGroup() {
+    }
+
     public ResourceGroup(String name) {
         this.name = name;
     }
@@ -47,5 +46,13 @@ public class ResourceGroup {
         Assert.notNull(name, "Name cannot be null");
         Assert.isTrue(!name.isBlank(), "Name cannot be blank");
         this.name = name;
+    }
+
+    public UUID getId() {
+        return this.id;
+    }
+
+    public String getName() {
+        return this.name;
     }
 }

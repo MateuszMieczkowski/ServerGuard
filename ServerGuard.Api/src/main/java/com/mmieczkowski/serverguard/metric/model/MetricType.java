@@ -1,8 +1,5 @@
 package com.mmieczkowski.serverguard.metric.model;
 
-import lombok.Getter;
-
-@Getter
 public enum MetricType {
     VOLTAGE(1, "V"),
     CURRENT(2, "A"),
@@ -14,7 +11,7 @@ public enum MetricType {
     FAN(8, "RPM"),
     FLOW(9, ""),
     CONTROL(10, ""),
-    LEVEL(11,"%"),
+    LEVEL(11, "%"),
     FACTOR(12, ""),
     DATA(13, "GB"),
     SMALL_DATA(14, "MB"),
@@ -32,4 +29,11 @@ public enum MetricType {
         this.unit = unit;
     }
 
+    public int getValue() {
+        return this.value;
+    }
+
+    public String getUnit() {
+        return this.unit;
+    }
 }

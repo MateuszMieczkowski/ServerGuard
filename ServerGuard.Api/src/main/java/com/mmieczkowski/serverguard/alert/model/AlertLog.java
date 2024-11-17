@@ -2,7 +2,6 @@ package com.mmieczkowski.serverguard.alert.model;
 
 import com.mmieczkowski.serverguard.agent.model.Agent;
 import jakarta.persistence.*;
-import lombok.Getter;
 
 import java.time.Clock;
 import java.time.Duration;
@@ -14,43 +13,33 @@ public class AlertLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Getter
     private UUID id;
 
     @ManyToOne(optional = false)
-    @Getter
     private Agent agent;
 
     @ManyToOne
-    @Getter
     private Alert alert;
 
     @Embedded
-    @Getter
     private AlertMetric metric;
 
     @Embedded
-    @Getter
     private AlertWhen when;
 
     @Embedded
-    @Getter
     private GroupBy groupBy;
 
-    @Getter
     @Column(nullable = false)
     private Duration duration;
 
     @Column(nullable = false)
-    @Getter
     private String AlertName;
 
     @Column(nullable = false)
-    @Getter
     private Instant triggeredAt;
 
     @Column(nullable = false)
-    @Getter
     private float triggeredByValue;
 
 
@@ -70,4 +59,43 @@ public class AlertLog {
     }
 
 
+    public UUID getId() {
+        return this.id;
+    }
+
+    public Agent getAgent() {
+        return this.agent;
+    }
+
+    public Alert getAlert() {
+        return this.alert;
+    }
+
+    public AlertMetric getMetric() {
+        return this.metric;
+    }
+
+    public AlertWhen getWhen() {
+        return this.when;
+    }
+
+    public GroupBy getGroupBy() {
+        return this.groupBy;
+    }
+
+    public Duration getDuration() {
+        return this.duration;
+    }
+
+    public String getAlertName() {
+        return this.AlertName;
+    }
+
+    public Instant getTriggeredAt() {
+        return this.triggeredAt;
+    }
+
+    public float getTriggeredByValue() {
+        return this.triggeredByValue;
+    }
 }

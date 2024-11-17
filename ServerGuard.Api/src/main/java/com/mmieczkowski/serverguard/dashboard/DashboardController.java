@@ -6,7 +6,6 @@ import com.mmieczkowski.serverguard.dashboard.response.CreateDashboardResponse;
 import com.mmieczkowski.serverguard.dashboard.response.GetDashboardResponse;
 import com.mmieczkowski.serverguard.dashboard.response.GetDashboardsResponse;
 import com.mmieczkowski.serverguard.dashboard.response.GetGraphDataResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,9 +13,12 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("api/resourceGroups/{resourceGroupId}/agents/{agentId}/dashboards")
-@RequiredArgsConstructor
 public class DashboardController {
     private final DashboardService dashboardService;
+
+    public DashboardController(DashboardService dashboardService) {
+        this.dashboardService = dashboardService;
+    }
 
     @GetMapping("/{dashboardId}")
     public GetDashboardResponse getDashboard(@PathVariable UUID resourceGroupId,

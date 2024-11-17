@@ -1,23 +1,22 @@
 package com.mmieczkowski.serverguard.dashboard;
 
+import com.mmieczkowski.serverguard.agent.AgentRepository;
 import com.mmieczkowski.serverguard.agent.exception.AgentNotFoundException;
+import com.mmieczkowski.serverguard.agent.model.Agent;
+import com.mmieczkowski.serverguard.dashboard.exception.DashboardNotFoundException;
 import com.mmieczkowski.serverguard.dashboard.exception.GraphNotFoundException;
 import com.mmieczkowski.serverguard.dashboard.model.Dashboard;
 import com.mmieczkowski.serverguard.dashboard.model.Graph;
 import com.mmieczkowski.serverguard.dashboard.request.CreateDashboardRequest;
 import com.mmieczkowski.serverguard.dashboard.request.GetGraphDataRequest;
 import com.mmieczkowski.serverguard.dashboard.response.CreateDashboardResponse;
-import com.mmieczkowski.serverguard.dashboard.exception.DashboardNotFoundException;
 import com.mmieczkowski.serverguard.dashboard.response.GetDashboardResponse;
 import com.mmieczkowski.serverguard.dashboard.response.GetDashboardsResponse;
 import com.mmieczkowski.serverguard.dashboard.response.GetGraphDataResponse;
 import com.mmieczkowski.serverguard.metric.MetricRepository;
 import com.mmieczkowski.serverguard.resourcegroup.exception.ResourceGroupNotFoundException;
-import com.mmieczkowski.serverguard.agent.model.Agent;
-import com.mmieczkowski.serverguard.agent.AgentRepository;
 import com.mmieczkowski.serverguard.service.UserService;
 import com.mmieczkowski.serverguard.user.User;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -27,13 +26,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@RequiredArgsConstructor
 @Service
 public class DashboardService {
     private final AgentRepository agentRepository;
     private final UserService userService;
     private final DashboardRepository dashboardRepository;
     private final MetricRepository metricRepository;
+
+    public DashboardService(AgentRepository agentRepository, UserService userService, DashboardRepository dashboardRepository, MetricRepository metricRepository) {
+        this.agentRepository = agentRepository;
+        this.userService = userService;
+        this.dashboardRepository = dashboardRepository;
+        this.metricRepository = metricRepository;
+    }
 
     @Transactional
     public CreateDashboardResponse createDashboard(UUID resourceGroupId, UUID agentId,

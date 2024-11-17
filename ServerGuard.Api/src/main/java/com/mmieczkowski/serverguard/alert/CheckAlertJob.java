@@ -8,8 +8,7 @@ import com.mmieczkowski.serverguard.resourcegroup.ResourceGroupRepository;
 import com.mmieczkowski.serverguard.service.EmailTemplateProvider;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -24,9 +23,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @Component
-@Slf4j
-@RequiredArgsConstructor
 public class CheckAlertJob {
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(CheckAlertJob.class);
     private final AlertRepository alertRepository;
     private final MetricRepository metricRepository;
     private final AlertLogRepository alertLogRepository;
@@ -35,6 +33,16 @@ public class CheckAlertJob {
     private final EmailTemplateProvider emailTemplateProvider;
     private final JavaMailSender mailSender;
     private static final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
+
+    public CheckAlertJob(AlertRepository alertRepository, MetricRepository metricRepository, AlertLogRepository alertLogRepository, ResourceGroupRepository resourceGroupRepository, Clock clock, EmailTemplateProvider emailTemplateProvider, JavaMailSender mailSender) {
+        this.alertRepository = alertRepository;
+        this.metricRepository = metricRepository;
+        this.alertLogRepository = alertLogRepository;
+        this.resourceGroupRepository = resourceGroupRepository;
+        this.clock = clock;
+        this.emailTemplateProvider = emailTemplateProvider;
+        this.mailSender = mailSender;
+    }
 
     @Scheduled(fixedRate = 1, timeUnit = TimeUnit.MINUTES)
     public void checkAlerts() {

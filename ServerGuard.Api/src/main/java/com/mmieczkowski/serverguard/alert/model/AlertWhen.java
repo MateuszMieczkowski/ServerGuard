@@ -3,16 +3,13 @@ package com.mmieczkowski.serverguard.alert.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Embedded;
-import lombok.Getter;
 
 @Embeddable
 public class AlertWhen {
 
-    @Getter
     @Column(nullable = false)
     private float threshold;
 
-    @Getter
     @Embedded
     private Operator operator;
 
@@ -27,5 +24,13 @@ public class AlertWhen {
 
     public boolean evaluate(float value) {
         return operator.evaluate(value, this.threshold);
+    }
+
+    public float getThreshold() {
+        return this.threshold;
+    }
+
+    public Operator getOperator() {
+        return this.operator;
     }
 }

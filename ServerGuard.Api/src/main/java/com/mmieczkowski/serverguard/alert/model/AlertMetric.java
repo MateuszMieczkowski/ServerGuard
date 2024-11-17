@@ -4,11 +4,9 @@ import com.mmieczkowski.serverguard.metric.model.MetricType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Enumerated;
-import lombok.Getter;
 
-@Getter
 @Embeddable
-public class AlertMetric{
+public class AlertMetric {
 
     @Column(nullable = false)
     private final String sensorName;
@@ -30,5 +28,17 @@ public class AlertMetric{
         this.sensorName = null;
         this.metricName = null;
         this.type = null;
+    }
+
+    public String getSensorName() {
+        return this.sensorName;
+    }
+
+    public String getMetricName() {
+        return this.metricName;
+    }
+
+    public MetricType getType() {
+        return this.type;
     }
 }

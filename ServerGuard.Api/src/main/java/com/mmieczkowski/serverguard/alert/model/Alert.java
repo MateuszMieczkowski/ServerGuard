@@ -2,7 +2,6 @@ package com.mmieczkowski.serverguard.alert.model;
 
 import com.mmieczkowski.serverguard.agent.model.Agent;
 import jakarta.persistence.*;
-import lombok.Getter;
 
 import java.time.Clock;
 import java.time.Duration;
@@ -14,35 +13,27 @@ public class Alert {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Getter
     private UUID id;
 
     @Column(nullable = false)
-    @Getter
     private String name;
 
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
-    @Getter
     private Agent agent;
 
-    @Getter
     @Embedded
     private AlertMetric metric;
 
     @Embedded
-    @Getter
     private AlertWhen when;
 
     @Embedded
-    @Getter
     private GroupBy groupBy;
 
-    @Getter
     @Column(nullable = false)
     private Duration duration;
 
-    @Getter
     @Column()
     private Instant nextCheckAt;
 
@@ -66,24 +57,24 @@ public class Alert {
     }
 
     public boolean check(float value, Clock clock) {
-        if(Float.isNaN(value)) {
+        if (Float.isNaN(value)) {
             return false;
         }
         boolean triggered = when.evaluate(value);
-        if(triggered) {
+        if (triggered) {
             resolvedAt = null;
         }
-        if(!triggered && resolvedAt == null){
+        if (!triggered && resolvedAt == null) {
             resolvedAt = clock.instant();
         }
         return triggered;
     }
 
     public boolean shouldNotify(Clock clock) {
-        if(resolvedAt != null) {
+        if (resolvedAt != null) {
             return false;
         }
-        if(nextNotificationAt == null) {
+        if (nextNotificationAt == null) {
             return true;
         }
         return clock.instant().isAfter(nextNotificationAt);
@@ -95,5 +86,33 @@ public class Alert {
 
     public void setNextCheck(Clock clock) {
         nextCheckAt = Instant.now(clock).plus(Duration.ofMinutes(1));
+    }
+
+    public UUID getId() {
+        return this.id;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public Agent getAgent() {
+        return this.agent;
+    }
+
+    public AlertMetric getMetric() {
+        return this.metric;
+    }
+
+    public AlertWhen getWhen() {
+        return this.when;
+    }
+
+    public GroupBy getGroupBy() {
+        return this.groupBy;
+    }
+
+    public Duration getDuration() {
+        return this.duration;
     }
 }

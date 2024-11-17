@@ -1,18 +1,17 @@
 package com.mmieczkowski.serverguard.metric;
 
+import com.mmieczkowski.serverguard.agent.AgentRepository;
 import com.mmieczkowski.serverguard.agent.exception.AgentNotFoundException;
-import com.mmieczkowski.serverguard.metric.response.GetAvailableMetricsResponse;
+import com.mmieczkowski.serverguard.agent.model.Agent;
 import com.mmieczkowski.serverguard.metric.model.AvailableMetric;
 import com.mmieczkowski.serverguard.metric.model.Metric;
 import com.mmieczkowski.serverguard.metric.model.MetricType;
 import com.mmieczkowski.serverguard.metric.request.SaveMetricsRequest;
-import com.mmieczkowski.serverguard.agent.model.Agent;
-import com.mmieczkowski.serverguard.agent.AgentRepository;
+import com.mmieczkowski.serverguard.metric.response.GetAvailableMetricsResponse;
 import com.mmieczkowski.serverguard.resourcegroup.exception.ResourceGroupNotFoundException;
 import com.mmieczkowski.serverguard.service.UserService;
 import com.mmieczkowski.serverguard.user.User;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
@@ -26,16 +25,27 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 @Service
-@Slf4j
 public class MetricService {
 
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(MetricService.class);
     private final AgentRepository agentRepository;
     private final MetricRepository metricRepository;
     private final UserService userService;
     private final Clock clock;
     private final SimpMessagingTemplate simpMessagingTemplate;
+
+    public MetricService(AgentRepository agentRepository,
+                         MetricRepository metricRepository,
+                         UserService userService,
+                         Clock clock,
+                         SimpMessagingTemplate simpMessagingTemplate) {
+        this.agentRepository = agentRepository;
+        this.metricRepository = metricRepository;
+        this.userService = userService;
+        this.clock = clock;
+        this.simpMessagingTemplate = simpMessagingTemplate;
+    }
 
     public void collectMetrics(String apiKey, SaveMetricsRequest saveMetricsRequest) {
         Agent agent = agentRepository.findAgentByAgentConfigApiKey(apiKey)
@@ -56,7 +66,7 @@ public class MetricService {
             }
         }
         metricRepository.saveAll(metricsToInsert);
-        try{
+        try {
             updateAvailableMetrics(agent.getId(), metricsToInsert);
         } catch (Exception e) {
             log.error("Failed to update available metrics", e);
@@ -81,7 +91,7 @@ public class MetricService {
                                 && existingMetric.getMetricName().equals(newMetric.getMetricName())
                                 && existingMetric.getType() == newMetric.getType()))
                 .toList();
-        if(metricsToAdd.isEmpty()) {
+        if (metricsToAdd.isEmpty()) {
             return;
         }
         metricRepository.saveAvailableMetrics(agentId, metricsToAdd);

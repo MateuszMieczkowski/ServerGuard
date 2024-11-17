@@ -9,10 +9,7 @@ import com.mmieczkowski.serverguard.metric.model.AvailableMetric;
 import com.mmieczkowski.serverguard.metric.model.Metric;
 import com.mmieczkowski.serverguard.metric.model.MetricType;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -21,11 +18,13 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-@Slf4j
-@RequiredArgsConstructor
 @Repository
 public class ClickHouseMetricRepository implements MetricRepository {
     private final Client client;
+
+    public ClickHouseMetricRepository(Client client) {
+        this.client = client;
+    }
 
     @PostConstruct
     public void setup() {

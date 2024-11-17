@@ -2,7 +2,6 @@ package com.mmieczkowski.serverguard.dashboard.model;
 
 import com.mmieczkowski.serverguard.metric.model.MetricType;
 import jakarta.persistence.*;
-import lombok.Getter;
 
 import java.util.UUID;
 
@@ -11,27 +10,21 @@ public class Graph {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Getter
     private UUID id;
 
     @Column(nullable = false)
-    @Getter
     private int index;
 
     @Column(nullable = false)
-    @Getter
     private String sensorName;
 
     @Column(nullable = false)
-    @Getter
     private String metricName;
 
     @Column(nullable = false)
-    @Getter
     private MetricType metricType;
 
     @Column(nullable = false)
-    @Getter
     private String lineColor;
 
     @ManyToOne(optional = false)
@@ -56,4 +49,27 @@ public class Graph {
         this.dashboard = dashboard;
     }
 
+    public UUID getId() {
+        return this.id;
+    }
+
+    public int getIndex() {
+        return this.index;
+    }
+
+    public String getSensorName() {
+        return this.sensorName;
+    }
+
+    public String getMetricName() {
+        return this.metricName;
+    }
+
+    public MetricType getMetricType() {
+        return this.metricType;
+    }
+
+    public String getLineColor() {
+        return this.lineColor;
+    }
 }

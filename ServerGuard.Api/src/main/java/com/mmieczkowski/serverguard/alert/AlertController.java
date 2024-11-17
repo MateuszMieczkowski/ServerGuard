@@ -6,7 +6,6 @@ import com.mmieczkowski.serverguard.alert.request.GetAlertsPageRequest;
 import com.mmieczkowski.serverguard.alert.response.GetAlertLogsPageResponse;
 import com.mmieczkowski.serverguard.alert.response.GetAlertsPageResponse;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,10 +13,13 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/resourceGroups/{resourceGroupId}/agents/{agentId}/alerts")
-@RequiredArgsConstructor
 public class AlertController {
 
     private final AlertService alertService;
+
+    public AlertController(AlertService alertService) {
+        this.alertService = alertService;
+    }
 
     @PostMapping
     public void createAlert(@PathVariable UUID resourceGroupId, @PathVariable UUID agentId, @RequestBody @Valid CreateAlertRequest createAlertRequest) {

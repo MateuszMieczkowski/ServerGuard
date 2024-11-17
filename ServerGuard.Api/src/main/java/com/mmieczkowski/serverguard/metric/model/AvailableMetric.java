@@ -1,10 +1,7 @@
 package com.mmieczkowski.serverguard.metric.model;
 
-import lombok.Getter;
-
 import java.util.UUID;
 
-@Getter
 public class AvailableMetric {
     private final UUID agentId;
     private final String sensorName;
@@ -16,5 +13,21 @@ public class AvailableMetric {
         this.sensorName = sensorName;
         this.metricName = metricName;
         this.type = type.getValue();
+    }
+
+    public UUID getAgentId() {
+        return this.agentId;
+    }
+
+    public String getSensorName() {
+        return this.sensorName;
+    }
+
+    public String getMetricName() {
+        return this.metricName;
+    }
+
+    public int getType() {
+        return this.type;
     }
 }
