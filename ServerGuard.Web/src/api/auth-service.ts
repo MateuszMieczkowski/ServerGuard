@@ -5,7 +5,7 @@ const config = getConfig();
 
 async function login(credentials: { email: string; password: string }): Promise<string> {
     try {
-        const response = await axios.post(`${config.apiUrl}/auth/login`, credentials, {
+        const response = await axios.post(`${config.apiUrl}/users/login`, credentials, {
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -40,7 +40,7 @@ interface RegisterRequest {
 
 export async function register(registerRequest: RegisterRequest): Promise<boolean> {
     try {
-        const response = await axios.post(`${config.apiUrl}/auth/register`, registerRequest, {
+        const response = await axios.post(`${config.apiUrl}/users/register`, registerRequest, {
             headers: {
                 'Content-Type': 'application/json'
             }
