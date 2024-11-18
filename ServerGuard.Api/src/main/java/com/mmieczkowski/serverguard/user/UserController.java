@@ -41,7 +41,7 @@ public class UserController {
         resetPasswordLinkService.create(request);
     }
 
-    @PutMapping("reset-password-link")
+    @PostMapping("reset-password")
     @ResponseBody
     public void resetPassword(@Validated @RequestBody ResetPasswordRequest request) {
         resetPasswordLinkService.reset(request);

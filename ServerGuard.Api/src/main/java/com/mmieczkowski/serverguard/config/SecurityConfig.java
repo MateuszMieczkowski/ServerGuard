@@ -54,7 +54,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("swagger-ui", "swagger-ui/**", "error", "v3/api-docs/**").permitAll()
-                        .requestMatchers("api/users/login", "api/users/register", "api/users/reset-password-link").permitAll()
+                        .requestMatchers("api/users/login", "api/users/register", "api/users/reset-password-link", "api/users/reset-password").permitAll()
                         .requestMatchers(("api/resourceGroups/{resourceGroupId}/agents/{agentId}/metrics"),
                                 HttpMethod.POST.name())
                         .permitAll()
