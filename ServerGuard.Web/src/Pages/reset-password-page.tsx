@@ -14,9 +14,9 @@ import { resetPassword } from "../api/users-service";
 
 const ResetPasswordPage: React.FC = () => {
   const [passwordReset, setPasswordReset] = useState(false);
-  const [tokenValid] = useState(true);
+  const [tokenValid, setTokenValid] = useState(true);
   const navigate = useNavigate();
-  const [token, setToken] = useSearchParams();
+  const [token] = useSearchParams();
 
   useEffect(() => {
     if (!token) {
