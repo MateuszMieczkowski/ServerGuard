@@ -3,14 +3,12 @@ package com.mmieczkowski.serverguard.metric;
 import com.mmieczkowski.serverguard.agent.AgentRepository;
 import com.mmieczkowski.serverguard.agent.exception.AgentNotFoundException;
 import com.mmieczkowski.serverguard.agent.model.Agent;
+import com.mmieczkowski.serverguard.annotation.ResourceGroupAccess;
 import com.mmieczkowski.serverguard.metric.model.AvailableMetric;
 import com.mmieczkowski.serverguard.metric.model.Metric;
 import com.mmieczkowski.serverguard.metric.model.MetricType;
 import com.mmieczkowski.serverguard.metric.request.SaveMetricsRequest;
 import com.mmieczkowski.serverguard.metric.response.GetAvailableMetricsResponse;
-import com.mmieczkowski.serverguard.resourcegroup.exception.ResourceGroupNotFoundException;
-import com.mmieczkowski.serverguard.service.UserService;
-import com.mmieczkowski.serverguard.user.model.User;
 import org.slf4j.Logger;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -31,18 +29,15 @@ public class MetricService {
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(MetricService.class);
     private final AgentRepository agentRepository;
     private final MetricRepository metricRepository;
-    private final UserService userService;
     private final Clock clock;
     private final SimpMessagingTemplate simpMessagingTemplate;
 
     public MetricService(AgentRepository agentRepository,
                          MetricRepository metricRepository,
-                         UserService userService,
                          Clock clock,
                          SimpMessagingTemplate simpMessagingTemplate) {
         this.agentRepository = agentRepository;
         this.metricRepository = metricRepository;
-        this.userService = userService;
         this.clock = clock;
         this.simpMessagingTemplate = simpMessagingTemplate;
     }
@@ -97,13 +92,9 @@ public class MetricService {
         metricRepository.saveAvailableMetrics(agentId, metricsToAdd);
     }
 
+    @ResourceGroupAccess
     public GetAvailableMetricsResponse getAvailableMetrics(UUID resourceGroupId, UUID agentId) {
-        User user = userService.getLoggedInUser()
-                .orElseThrow();
-        if (!user.hasAccessToResourceGroup(resourceGroupId)) {
-            throw new ResourceGroupNotFoundException(resourceGroupId);
-        }
-        Agent agent = agentRepository.findAgentByIdAndUserId(agentId, user.getId())
+        Agent agent = agentRepository.findById(agentId)
                 .orElseThrow(AgentNotFoundException::new);
 
         List<AvailableMetric> availableMetrics = metricRepository.findAvailableMetricsByAgentId(agent.getId());

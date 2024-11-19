@@ -3,6 +3,7 @@ package com.mmieczkowski.serverguard.dashboard;
 import com.mmieczkowski.serverguard.agent.AgentRepository;
 import com.mmieczkowski.serverguard.agent.exception.AgentNotFoundException;
 import com.mmieczkowski.serverguard.agent.model.Agent;
+import com.mmieczkowski.serverguard.annotation.ResourceGroupAccess;
 import com.mmieczkowski.serverguard.dashboard.exception.DashboardNotFoundException;
 import com.mmieczkowski.serverguard.dashboard.exception.GraphNotFoundException;
 import com.mmieczkowski.serverguard.dashboard.model.Dashboard;
@@ -14,10 +15,6 @@ import com.mmieczkowski.serverguard.dashboard.response.GetDashboardResponse;
 import com.mmieczkowski.serverguard.dashboard.response.GetDashboardsResponse;
 import com.mmieczkowski.serverguard.dashboard.response.GetGraphDataResponse;
 import com.mmieczkowski.serverguard.metric.MetricRepository;
-import com.mmieczkowski.serverguard.resourcegroup.exception.ResourceGroupNotFoundException;
-import com.mmieczkowski.serverguard.service.UserService;
-import com.mmieczkowski.serverguard.user.model.User;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,24 +26,22 @@ import java.util.UUID;
 @Service
 public class DashboardService {
     private final AgentRepository agentRepository;
-    private final UserService userService;
     private final DashboardRepository dashboardRepository;
     private final MetricRepository metricRepository;
 
-    public DashboardService(AgentRepository agentRepository, UserService userService, DashboardRepository dashboardRepository, MetricRepository metricRepository) {
+    public DashboardService(AgentRepository agentRepository,
+                            DashboardRepository dashboardRepository,
+                            MetricRepository metricRepository) {
         this.agentRepository = agentRepository;
-        this.userService = userService;
         this.dashboardRepository = dashboardRepository;
         this.metricRepository = metricRepository;
     }
 
     @Transactional
+    @ResourceGroupAccess
     public CreateDashboardResponse createDashboard(UUID resourceGroupId, UUID agentId,
                                                    CreateDashboardRequest request) {
-        var userId = userService.getLoggedInUser()
-                .orElseThrow()
-                .getId();
-        Agent agent = agentRepository.findAgentByIdAndUserId(agentId, userId)
+        Agent agent = agentRepository.findById(agentId)
                 .orElseThrow(AgentNotFoundException::new);
 
         List<Graph> graphs = request.graphs()
@@ -62,9 +57,9 @@ public class DashboardService {
         return new CreateDashboardResponse(dashboard.getId(), dashboard.getName());
     }
 
+    @ResourceGroupAccess
     public GetDashboardResponse getDashboard(UUID resourceGroupId, UUID agentId, UUID dashboardId) {
-        var user = getUserOrThrow(resourceGroupId);
-        agentRepository.findAgentByIdAndUserId(agentId, user.getId())
+        agentRepository.findById(agentId)
                 .orElseThrow(AgentNotFoundException::new);
         Dashboard dashboard = dashboardRepository.findById(dashboardId)
                 .orElseThrow(DashboardNotFoundException::new);
@@ -81,9 +76,9 @@ public class DashboardService {
         return new GetDashboardResponse(dashboard.getName(), graphs);
     }
 
+    @ResourceGroupAccess
     public GetDashboardsResponse getDashboards(UUID resourceGroupId, UUID agentId) {
-        var user = getUserOrThrow(resourceGroupId);
-        agentRepository.findAgentByIdAndUserId(agentId, user.getId())
+        agentRepository.findById(agentId)
                 .orElseThrow(AgentNotFoundException::new);
         var dashboards = dashboardRepository.findAllByAgentId(agentId, Sort.by("name")).stream()
                 .map(dashboard -> new GetDashboardsResponse.Dashboard(dashboard.getId(),
@@ -93,10 +88,10 @@ public class DashboardService {
         return new GetDashboardsResponse(dashboards);
     }
 
+    @ResourceGroupAccess
     public GetGraphDataResponse getGraphData(UUID resourceGroupId, UUID agentId, UUID dashboardId, int graphIndex,
                                              GetGraphDataRequest request) {
-        var user = getUserOrThrow(resourceGroupId);
-        Agent agent = agentRepository.findAgentByIdAndUserId(agentId, user.getId())
+        Agent agent = agentRepository.findById(agentId)
                 .orElseThrow(AgentNotFoundException::new);
         Dashboard dashboard = dashboardRepository.findById(dashboardId)
                 .orElseThrow(DashboardNotFoundException::new);
@@ -130,19 +125,9 @@ public class DashboardService {
         }
     }
 
-    @NotNull
-    private User getUserOrThrow(UUID resourceGroupId) {
-        var user = userService.getLoggedInUser()
-                .orElseThrow();
-        if (!user.hasAccessToResourceGroup(resourceGroupId)) {
-            throw new ResourceGroupNotFoundException(resourceGroupId);
-        }
-        return user;
-    }
-
+    @ResourceGroupAccess
     public void deleteDashboard(UUID resourceGroupId, UUID agentId, UUID dashboardId) {
-        var user = getUserOrThrow(resourceGroupId);
-        agentRepository.findAgentByIdAndUserId(agentId, user.getId())
+        agentRepository.findById(agentId)
                 .orElseThrow(AgentNotFoundException::new);
         var dashboardOptional = dashboardRepository.findById(dashboardId);
         if (dashboardOptional.isEmpty()) {
@@ -151,10 +136,10 @@ public class DashboardService {
         dashboardRepository.delete(dashboardOptional.get());
     }
 
+    @ResourceGroupAccess
     public void updateDashboard(UUID resourceGroupId, UUID agentId, UUID dashboardId,
                                 CreateDashboardRequest request) {
-        var user = getUserOrThrow(resourceGroupId);
-        agentRepository.findAgentByIdAndUserId(agentId, user.getId())
+        agentRepository.findById(agentId)
                 .orElseThrow(AgentNotFoundException::new);
         Dashboard dashboard = dashboardRepository.findById(dashboardId)
                 .orElseThrow(DashboardNotFoundException::new);

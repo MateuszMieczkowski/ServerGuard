@@ -9,9 +9,7 @@ import com.mmieczkowski.serverguard.alert.request.GetAlertLogsPageRequest;
 import com.mmieczkowski.serverguard.alert.request.GetAlertsPageRequest;
 import com.mmieczkowski.serverguard.alert.response.GetAlertLogsPageResponse;
 import com.mmieczkowski.serverguard.alert.response.GetAlertsPageResponse;
-import com.mmieczkowski.serverguard.resourcegroup.exception.ResourceGroupNotFoundException;
-import com.mmieczkowski.serverguard.service.UserService;
-import com.mmieczkowski.serverguard.user.model.User;
+import com.mmieczkowski.serverguard.annotation.ResourceGroupAccess;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -23,26 +21,18 @@ import java.util.UUID;
 @Service
 public class AlertService {
     private final AgentRepository agentRepository;
-    private final UserService userService;
     private final AlertRepository alertRepository;
     private final AlertLogRepository alertLogRepository;
 
     public AlertService(AgentRepository agentRepository,
-                        UserService userService,
                         AlertRepository alertRepository,
                         AlertLogRepository alertLogRepository) {
         this.agentRepository = agentRepository;
-        this.userService = userService;
         this.alertRepository = alertRepository;
         this.alertLogRepository = alertLogRepository;
     }
-
+    @ResourceGroupAccess
     public void createAlert(UUID resourceGroupId, UUID agentId, CreateAlertRequest request) {
-        User user = userService.getLoggedInUser()
-                .orElseThrow();
-        if (!user.hasAccessToResourceGroup(resourceGroupId)) {
-            throw new ResourceGroupNotFoundException(resourceGroupId);
-        }
         Agent agent = agentRepository.findById(agentId)
                 .orElseThrow(AgentNotFoundException::new);
         AlertMetric metric = new AlertMetric(request.metric().sensorName(), request.metric().metricName(), request.metric().type());
@@ -53,12 +43,8 @@ public class AlertService {
         alertRepository.save(alert);
     }
 
+    @ResourceGroupAccess
     public GetAlertLogsPageResponse getAlertLogsPage(UUID resourceGroupId, UUID agentId, GetAlertLogsPageRequest request) {
-        User user = userService.getLoggedInUser()
-                .orElseThrow();
-        if (!user.hasAccessToResourceGroup(resourceGroupId)) {
-            throw new ResourceGroupNotFoundException(resourceGroupId);
-        }
         Agent agent = agentRepository.findById(agentId)
                 .orElseThrow(AgentNotFoundException::new);
         var pageable = PageRequest.of(request.pageNumber(),
@@ -82,12 +68,8 @@ public class AlertService {
         return new GetAlertLogsPageResponse(responsePage);
     }
 
+    @ResourceGroupAccess
     public void deleteAlert(UUID resourceGroupId, UUID agentId, UUID alertId) {
-        User user = userService.getLoggedInUser()
-                .orElseThrow();
-        if (!user.hasAccessToResourceGroup(resourceGroupId)) {
-            throw new ResourceGroupNotFoundException(resourceGroupId);
-        }
         agentRepository.findById(agentId)
                 .orElseThrow(AgentNotFoundException::new);
         Optional<Alert> optionalAlert = alertRepository.findById(alertId);
@@ -97,12 +79,8 @@ public class AlertService {
         alertRepository.delete(optionalAlert.get());
     }
 
+    @ResourceGroupAccess
     public GetAlertsPageResponse getAlertsPage(UUID resourceGroupId, UUID agentId, GetAlertsPageRequest request) {
-        User user = userService.getLoggedInUser()
-                .orElseThrow();
-        if (!user.hasAccessToResourceGroup(resourceGroupId)) {
-            throw new ResourceGroupNotFoundException(resourceGroupId);
-        }
         Agent agent = agentRepository.findById(agentId)
                 .orElseThrow(AgentNotFoundException::new);
         var pageable = PageRequest.of(request.pageNumber(),

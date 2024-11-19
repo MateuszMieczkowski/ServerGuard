@@ -14,12 +14,11 @@ import { resetPassword } from "../api/users-service";
 
 const ResetPasswordPage: React.FC = () => {
   const [passwordReset, setPasswordReset] = useState(false);
-  const [tokenValid, setTokenValid] = useState(true);
+  const [tokenValid] = useState(true);
   const navigate = useNavigate();
   const [token, setToken] = useSearchParams();
 
   useEffect(() => {
-    // Simulate token validation
     if (!token) {
       setTokenValid(false);
     }

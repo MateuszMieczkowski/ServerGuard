@@ -6,6 +6,6 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public interface UserService {
+public interface CurrentUserService {
     Optional<User> getLoggedInUser();
 }

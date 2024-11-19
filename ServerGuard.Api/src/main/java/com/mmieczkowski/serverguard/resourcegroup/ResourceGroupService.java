@@ -1,5 +1,6 @@
 package com.mmieczkowski.serverguard.resourcegroup;
 
+import com.mmieczkowski.serverguard.annotation.ResourceGroupAccess;
 import com.mmieczkowski.serverguard.resourcegroup.model.ResourceGroup;
 import com.mmieczkowski.serverguard.resourcegroup.model.ResourceGroupUserRole;
 import com.mmieczkowski.serverguard.resourcegroup.model.UserResourceGroupPermission;
@@ -9,7 +10,7 @@ import com.mmieczkowski.serverguard.resourcegroup.exception.ResourceGroupNotFoun
 import com.mmieczkowski.serverguard.resourcegroup.response.GetResourceGroupResponse;
 import com.mmieczkowski.serverguard.resourcegroup.request.GetResourceGroupPaginatedRequest;
 import com.mmieczkowski.serverguard.resourcegroup.response.GetResourceGroupPaginatedResponse;
-import com.mmieczkowski.serverguard.service.UserService;
+import com.mmieczkowski.serverguard.service.CurrentUserService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,18 +22,18 @@ import java.util.UUID;
 @Service
 public class ResourceGroupService {
     private final ResourceGroupRepository resourceGroupRepository;
-    private final UserService userService;
+    private final CurrentUserService currentUserService;
     private final UserResourceGroupPermissionRepository userResourceGroupPermissionRepository;
 
-    public ResourceGroupService(ResourceGroupRepository resourceGroupRepository, UserService userService, UserResourceGroupPermissionRepository userResourceGroupPermissionRepository) {
+    public ResourceGroupService(ResourceGroupRepository resourceGroupRepository, CurrentUserService currentUserService, UserResourceGroupPermissionRepository userResourceGroupPermissionRepository) {
         this.resourceGroupRepository = resourceGroupRepository;
-        this.userService = userService;
+        this.currentUserService = currentUserService;
         this.userResourceGroupPermissionRepository = userResourceGroupPermissionRepository;
     }
 
     @Transactional
     public CreateResourceGroupResponse createResourceGroup(CreateResourceGroupRequest request) {
-        var user = userService.getLoggedInUser()
+        var user = currentUserService.getLoggedInUser()
                 .orElseThrow();
         ResourceGroup resourceGroup = new ResourceGroup(request.name());
         resourceGroupRepository.save(resourceGroup);
@@ -43,6 +44,7 @@ public class ResourceGroupService {
         return new CreateResourceGroupResponse(resourceGroup.getId(), resourceGroup.getName());
     }
 
+    @ResourceGroupAccess("id")
     public GetResourceGroupResponse getResourceGroup(UUID id){
         ResourceGroup resourceGroup = resourceGroupRepository.findById(id)
                 .orElseThrow(() -> new ResourceGroupNotFoundException(id));
@@ -50,7 +52,7 @@ public class ResourceGroupService {
     }
 
     public GetResourceGroupPaginatedResponse getResourceGroups(GetResourceGroupPaginatedRequest request) {
-        var user = userService.getLoggedInUser()
+        var user = currentUserService.getLoggedInUser()
                 .orElseThrow();
         var pageable = PageRequest.of(request.pageNumber(), request.pageSize())
                 .withSort(Sort.by("rg.name"));
@@ -61,21 +63,13 @@ public class ResourceGroupService {
         return new GetResourceGroupPaginatedResponse(items, page.getNumber(), page.getSize(), page.getTotalPages());
     }
 
+    @ResourceGroupAccess("id")
     public void deleteResourceGroup(UUID id) {
-        var user = userService.getLoggedInUser()
-                .orElseThrow();
-        if(!user.hasAccessToResourceGroup(id)){
-            throw new ResourceGroupNotFoundException(id);
-        }
         resourceGroupRepository.deleteById(id);
     }
 
+    @ResourceGroupAccess("id")
     public void updateResourceGroup(UUID id, CreateResourceGroupRequest request) {
-        var user = userService.getLoggedInUser()
-                .orElseThrow();
-        if(!user.hasAccessToResourceGroup(id)){
-            throw new ResourceGroupNotFoundException(id);
-        }
         ResourceGroup resourceGroup = resourceGroupRepository.findById(id)
                 .orElseThrow(() -> new ResourceGroupNotFoundException(id));
         resourceGroup.setName(request.name());

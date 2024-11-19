@@ -3,18 +3,16 @@ package com.mmieczkowski.serverguard.agent;
 import com.mmieczkowski.serverguard.agent.exception.AgentNotFoundException;
 import com.mmieczkowski.serverguard.agent.model.Agent;
 import com.mmieczkowski.serverguard.agent.request.CreateAgentRequest;
-import com.mmieczkowski.serverguard.agent.request.GetAgentRequest;
 import com.mmieczkowski.serverguard.agent.request.GetAgentsPaginatedRequest;
 import com.mmieczkowski.serverguard.agent.request.UpdateAgentRequest;
 import com.mmieczkowski.serverguard.agent.response.CreateAgentResponse;
 import com.mmieczkowski.serverguard.agent.response.GetAgentConfigResponse;
 import com.mmieczkowski.serverguard.agent.response.GetAgentResponse;
 import com.mmieczkowski.serverguard.agent.response.GetAgentsPaginatedResponse;
+import com.mmieczkowski.serverguard.annotation.ResourceGroupAccess;
 import com.mmieczkowski.serverguard.resourcegroup.ResourceGroupRepository;
 import com.mmieczkowski.serverguard.resourcegroup.exception.ResourceGroupNotFoundException;
 import com.mmieczkowski.serverguard.service.SecureRandomString;
-import com.mmieczkowski.serverguard.service.UserService;
-import com.mmieczkowski.serverguard.user.model.User;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -24,24 +22,17 @@ import java.util.UUID;
 
 @Service
 public class AgentService {
-
     private final AgentRepository agentRepository;
     private final ResourceGroupRepository ResourceGroupRepository;
-    private final UserService userService;
 
-    public AgentService(AgentRepository agentRepository, ResourceGroupRepository ResourceGroupRepository, UserService userService) {
+    public AgentService(AgentRepository agentRepository, ResourceGroupRepository ResourceGroupRepository) {
         this.agentRepository = agentRepository;
         this.ResourceGroupRepository = ResourceGroupRepository;
-        this.userService = userService;
     }
 
     @Transactional
+    @ResourceGroupAccess
     public CreateAgentResponse createAgent(UUID resourceGroupId, CreateAgentRequest request) {
-        User user = userService.getLoggedInUser()
-                .orElseThrow();
-        if (!user.hasAccessToResourceGroup(resourceGroupId)) {
-            throw new ResourceGroupNotFoundException(resourceGroupId);
-        }
         var resourceGroup = ResourceGroupRepository.findById(resourceGroupId)
                 .orElseThrow(() -> new ResourceGroupNotFoundException(resourceGroupId));
         var agentConfig = request.agentConfig().toAgentConfig();
@@ -51,19 +42,17 @@ public class AgentService {
         return new CreateAgentResponse(agent.getId(), agent.getName());
     }
 
-    public GetAgentResponse getAgent(GetAgentRequest request) {
-        UUID userId = userService.getLoggedInUser()
-                .orElseThrow().getId();
-        Agent agent = agentRepository.findAgentByIdAndUserId(request.id(), userId)
+    @ResourceGroupAccess
+    public GetAgentResponse getAgent(UUID resourceGroupId, UUID agentId) {
+        Agent agent = agentRepository.findById(agentId)
                 .orElseThrow(AgentNotFoundException::new);
         GetAgentResponse.AgentConfig agentConfig = new GetAgentResponse.AgentConfig(agent.getAgentConfig());
         return new GetAgentResponse(agent.getId(), agent.getName(), agentConfig, agent.getLastContactAt());
     }
 
-    public void updateAgent(UUID agentId, UpdateAgentRequest request) {
-        UUID userId = userService.getLoggedInUser()
-                .orElseThrow().getId();
-        Agent agent = agentRepository.findAgentByIdAndUserId(agentId, userId)
+    @ResourceGroupAccess
+    public void updateAgent(UUID resourceGroupId, UUID agentId, UpdateAgentRequest request) {
+        Agent agent = agentRepository.findById(agentId)
                 .orElseThrow(AgentNotFoundException::new);
         agent.setName(request.name());
         var newAgentConfig = request.agentConfig().toAgentConfig();
@@ -72,12 +61,8 @@ public class AgentService {
         agentRepository.save(agent);
     }
 
+    @ResourceGroupAccess
     public GetAgentsPaginatedResponse getAgentsPaginated(UUID resourceGroupId, GetAgentsPaginatedRequest request) {
-        User user = userService.getLoggedInUser()
-                .orElseThrow();
-        if (!user.hasAccessToResourceGroup(resourceGroupId)) {
-            throw new ResourceGroupNotFoundException(resourceGroupId);
-        }
         var pageable = PageRequest.of(request.pageNumber(), request.pageSize())
                 .withSort(Sort.by("name"));
         var agentsPage = agentRepository.findAgentsByResourceGroupId(resourceGroupId, pageable);
@@ -90,15 +75,9 @@ public class AgentService {
                 agentsPage.getTotalPages());
     }
 
+    @ResourceGroupAccess
     public void deleteAgent(UUID resourceGroupId, UUID agentId) {
-        User user = userService.getLoggedInUser()
-                .orElseThrow();
-        if (!user.hasAccessToResourceGroup(resourceGroupId)) {
-            throw new ResourceGroupNotFoundException(resourceGroupId);
-        }
-        UUID userId = userService.getLoggedInUser()
-                .orElseThrow().getId();
-        var agentOptional = agentRepository.findAgentByIdAndUserId(agentId, userId);
+        var agentOptional = agentRepository.findById(agentId);
         if (agentOptional.isEmpty()) {
             return;
         }

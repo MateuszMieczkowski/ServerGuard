@@ -15,11 +15,6 @@ public interface AgentRepository extends JpaRepository<Agent, UUID> {
 
     Optional<Agent> findAgentByAgentConfigApiKey(String apiKey);
 
-    @Query("SELECT a FROM Agent a " +
-            "WHERE a.id = :agentId " +
-            "AND EXISTS (SELECT 1 FROM UserResourceGroupPermission up WHERE up.user.id = :userId AND up.resourceGroup.id = a.resourceGroup.id)")
-    Optional<Agent> findAgentByIdAndUserId(UUID agentId, UUID userId);
-
     Page<Agent> findAgentsByResourceGroupId(UUID resourceGroupId, Pageable pageable);
 
     @Override

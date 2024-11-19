@@ -1,7 +1,6 @@
 package com.mmieczkowski.serverguard.agent;
 
 import com.mmieczkowski.serverguard.agent.request.CreateAgentRequest;
-import com.mmieczkowski.serverguard.agent.request.GetAgentRequest;
 import com.mmieczkowski.serverguard.agent.request.GetAgentsPaginatedRequest;
 import com.mmieczkowski.serverguard.agent.request.UpdateAgentRequest;
 import com.mmieczkowski.serverguard.agent.response.CreateAgentResponse;
@@ -29,14 +28,14 @@ public class AgentController {
 
     @GetMapping("/{agentId}")
     public GetAgentResponse getAgent(@PathVariable UUID resourceGroupId, @PathVariable UUID agentId) {
-        return agentService.getAgent(new GetAgentRequest(resourceGroupId, agentId));
+        return agentService.getAgent(resourceGroupId, agentId);
     }
 
     @PutMapping("/{agentId}")
     public void updateAgent(@PathVariable UUID resourceGroupId,
                             @PathVariable UUID agentId,
                             @Validated @RequestBody UpdateAgentRequest request) {
-        agentService.updateAgent(agentId, request);
+        agentService.updateAgent(resourceGroupId, agentId, request);
     }
 
     @GetMapping
