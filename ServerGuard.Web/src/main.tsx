@@ -18,9 +18,12 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import utc from "dayjs/plugin/utc";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
+import timezone from "dayjs/plugin/timezone";
 import dayjs from "dayjs";
 import { ResourceGroupSettingsPage } from "./Pages/resource-group-settings.tsx";
 import { AlertsPage } from "./Pages/alerts-page.tsx";
+import ForgotPasswordPage from "./Pages/forgot-password-page.tsx";
+import ResetPasswordPage from "./Pages/reset-password-page.tsx";
 
 const router = createBrowserRouter([
   {
@@ -54,6 +57,14 @@ const router = createBrowserRouter([
     path: "/sign-up",
     element: <SignUpPage />,
   },
+  {
+    path: "/forgot-password",
+    element: <ForgotPasswordPage />,
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPasswordPage />,
+  },
 ]);
 
 const theme = createTheme({
@@ -65,6 +76,7 @@ const theme = createTheme({
 dayjs.extend(utc);
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
+dayjs.extend(timezone);
 
 window.addEventListener("authTokenRemoved", () => {
   router.navigate("/sign-in");

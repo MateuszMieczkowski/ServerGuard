@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import getConfig from "../config";
 import axios from 'axios';
 
@@ -53,6 +54,45 @@ export async function register(registerRequest: RegisterRequest): Promise<boolea
         return true;
     } catch (error) {
         console.error('Registration failed:', error);
+        return false;
+    }
+}
+
+export async function forgotPassword(email: string): Promise<boolean> {
+    try {
+        const timeZoneId = dayjs.tz.guess() ?? "UTC";
+        const response = await axios.post(`${config.apiUrl}/users/reset-password-link`, { email, timeZoneId }, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.status !== 200) {
+            throw new Error('Forgot password failed');
+        }
+
+        return true;
+    } catch (error) {
+        console.error('Forgot password failed:', error);
+        return false;
+    }
+}
+
+export async function resetPassword(token: string, newPassword: string): Promise<boolean> {
+    try {
+        const response = await axios.post(`${config.apiUrl}/users/reset-password`, { token, newPassword }, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.status !== 200) {
+            throw new Error('Reset password failed');
+        }
+
+        return true;
+    } catch (error) {
+        console.error('Reset password failed:', error);
         return false;
     }
 }
