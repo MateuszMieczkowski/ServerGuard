@@ -9,7 +9,7 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
-import { register } from "../api/auth-service";
+import { register } from "../api/users-service";
 import { Navigate } from "react-router-dom";
 import * as yup from "yup";
 

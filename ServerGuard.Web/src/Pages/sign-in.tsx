@@ -12,7 +12,7 @@ import {
   Container,
 } from "@mui/material";
 import { Navigate, Link as RouterLink } from "react-router-dom";
-import { loginUser } from "../api/auth-service";
+import { loginUser } from "../api/users-service";
 
 const validationSchema = Yup.object({
   email: Yup.string().email("Invalid email address").required("Required"),
