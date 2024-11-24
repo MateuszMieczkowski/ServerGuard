@@ -189,7 +189,7 @@ public class ClickHouseMetricRepository implements MetricRepository {
             }
             ClickHouseBinaryFormatReader reader = Client.newBinaryFormatReader(queryResponse);
             reader.next();
-            return reader.getDouble(1);
+            return reader.getFloat(1);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
