@@ -9,6 +9,7 @@ import com.mmieczkowski.serverguard.metric.model.AvailableMetric;
 import com.mmieczkowski.serverguard.metric.model.Metric;
 import com.mmieczkowski.serverguard.metric.model.MetricType;
 import jakarta.annotation.PostConstruct;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -18,6 +19,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+@Profile({"production", "development"})
 @Repository
 public class ClickHouseMetricRepository implements MetricRepository {
     private final Client client;
