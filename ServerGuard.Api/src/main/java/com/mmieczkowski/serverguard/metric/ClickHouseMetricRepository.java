@@ -9,7 +9,6 @@ import com.mmieczkowski.serverguard.metric.model.AvailableMetric;
 import com.mmieczkowski.serverguard.metric.model.Metric;
 import com.mmieczkowski.serverguard.metric.model.MetricType;
 import jakarta.annotation.PostConstruct;
-import org.intellij.lang.annotations.Language;
 import org.springframework.stereotype.Repository;
 import java.time.Duration;
 import java.time.LocalDateTime;

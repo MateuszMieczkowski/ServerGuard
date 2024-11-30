@@ -1,11 +1,6 @@
 spring:
   application:
     name: ServerGuard
-  datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    driver-class-name: org.postgresql.Driver
-    username: postgres
-    password: mysecretpassword
   jpa:
     show-sql: true
     hibernate:
@@ -15,30 +10,26 @@ spring:
   jackson:
     mapper:
       accept-case-insensitive-enums: true
-  config:
-    import: optional:secrets.yml
   threads:
     virtual:
       enabled: true
+  profiles:
+    active: production
 
 rsa:
   private-key: classpath:certs/private.pem
   public-key: classpath:certs/public.pem
 
-clickhouse:
-  password: mysecretpassword
-  username: default
-  url: http://localhost:8123/default
-
-smtp:
-  host: smtp.gmail.com
-  port: 587
-  username: xxx
-  password: xxx
-
 logging:
   level:
     clickhouse: DEBUG
+  file:
+    name: /var/log/serverguard/serverguard-api.log
+  logback:
+    rollingpolicy:
+      file-name-pattern: ${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz
+      clean-history-on-start: false
+      max-history: 30
 
 web:
   url: http://65.109.225.191
