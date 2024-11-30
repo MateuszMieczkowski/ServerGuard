@@ -1,6 +1,7 @@
 package com.mmieczkowski.serverguard.annotation;
 
 import com.mmieczkowski.serverguard.exception.NoAccessToResourceGroupException;
+import com.mmieczkowski.serverguard.resourcegroup.model.ResourceGroupUserRole;
 import com.mmieczkowski.serverguard.service.ResourceGroupAccessPolicyEvaluator;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -28,7 +29,7 @@ public class ResourceGroupAccessAspect {
         if(resourceGroupId == null){
             throw new IllegalArgumentException("ResourceGroupId not found");
         }
-        boolean hasAccess = resourceGroupAccessPolicyEvaluator.evaluate(resourceGroupId);
+        boolean hasAccess = resourceGroupAccessPolicyEvaluator.evaluate(resourceGroupId, getRoles(methodSignature));
         if(!hasAccess){
             throw new NoAccessToResourceGroupException();
         }
@@ -49,5 +50,11 @@ public class ResourceGroupAccessAspect {
 
         }
         return resourceGroupId;
+    }
+
+    private static ResourceGroupUserRole[] getRoles(MethodSignature methodSignature) {
+        Method method = methodSignature.getMethod();
+        ResourceGroupAccess annotation = method.getAnnotation(ResourceGroupAccess.class);
+        return annotation.roles();
     }
 }

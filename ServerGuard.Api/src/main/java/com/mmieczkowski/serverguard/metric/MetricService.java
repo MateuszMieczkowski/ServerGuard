@@ -9,6 +9,7 @@ import com.mmieczkowski.serverguard.metric.model.Metric;
 import com.mmieczkowski.serverguard.metric.model.MetricType;
 import com.mmieczkowski.serverguard.metric.request.SaveMetricsRequest;
 import com.mmieczkowski.serverguard.metric.response.GetAvailableMetricsResponse;
+import com.mmieczkowski.serverguard.resourcegroup.model.ResourceGroupUserRole;
 import org.slf4j.Logger;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -92,7 +93,7 @@ public class MetricService {
         metricRepository.saveAvailableMetrics(agentId, metricsToAdd);
     }
 
-    @ResourceGroupAccess
+    @ResourceGroupAccess(roles = {ResourceGroupUserRole.USER, ResourceGroupUserRole.ADMIN})
     public GetAvailableMetricsResponse getAvailableMetrics(UUID resourceGroupId, UUID agentId) {
         Agent agent = agentRepository.findById(agentId)
                 .orElseThrow(AgentNotFoundException::new);

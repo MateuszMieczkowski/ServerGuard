@@ -15,6 +15,7 @@ import com.mmieczkowski.serverguard.dashboard.response.GetDashboardResponse;
 import com.mmieczkowski.serverguard.dashboard.response.GetDashboardsResponse;
 import com.mmieczkowski.serverguard.dashboard.response.GetGraphDataResponse;
 import com.mmieczkowski.serverguard.metric.MetricRepository;
+import com.mmieczkowski.serverguard.resourcegroup.model.ResourceGroupUserRole;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +39,7 @@ public class DashboardService {
     }
 
     @Transactional
-    @ResourceGroupAccess
+    @ResourceGroupAccess(roles = {ResourceGroupUserRole.USER, ResourceGroupUserRole.ADMIN})
     public CreateDashboardResponse createDashboard(UUID resourceGroupId, UUID agentId,
                                                    CreateDashboardRequest request) {
         Agent agent = agentRepository.findById(agentId)
@@ -57,7 +58,7 @@ public class DashboardService {
         return new CreateDashboardResponse(dashboard.getId(), dashboard.getName());
     }
 
-    @ResourceGroupAccess
+    @ResourceGroupAccess(roles = {ResourceGroupUserRole.USER, ResourceGroupUserRole.ADMIN})
     public GetDashboardResponse getDashboard(UUID resourceGroupId, UUID agentId, UUID dashboardId) {
         agentRepository.findById(agentId)
                 .orElseThrow(AgentNotFoundException::new);
@@ -76,7 +77,7 @@ public class DashboardService {
         return new GetDashboardResponse(dashboard.getName(), graphs);
     }
 
-    @ResourceGroupAccess
+    @ResourceGroupAccess(roles = {ResourceGroupUserRole.USER, ResourceGroupUserRole.ADMIN})
     public GetDashboardsResponse getDashboards(UUID resourceGroupId, UUID agentId) {
         agentRepository.findById(agentId)
                 .orElseThrow(AgentNotFoundException::new);
@@ -88,7 +89,7 @@ public class DashboardService {
         return new GetDashboardsResponse(dashboards);
     }
 
-    @ResourceGroupAccess
+    @ResourceGroupAccess(roles = {ResourceGroupUserRole.USER, ResourceGroupUserRole.ADMIN})
     public GetGraphDataResponse getGraphData(UUID resourceGroupId, UUID agentId, UUID dashboardId, int graphIndex,
                                              GetGraphDataRequest request) {
         Agent agent = agentRepository.findById(agentId)
@@ -125,7 +126,7 @@ public class DashboardService {
         }
     }
 
-    @ResourceGroupAccess
+    @ResourceGroupAccess(roles = {ResourceGroupUserRole.USER, ResourceGroupUserRole.ADMIN})
     public void deleteDashboard(UUID resourceGroupId, UUID agentId, UUID dashboardId) {
         agentRepository.findById(agentId)
                 .orElseThrow(AgentNotFoundException::new);
@@ -136,7 +137,7 @@ public class DashboardService {
         dashboardRepository.delete(dashboardOptional.get());
     }
 
-    @ResourceGroupAccess
+    @ResourceGroupAccess(roles = {ResourceGroupUserRole.USER, ResourceGroupUserRole.ADMIN})
     public void updateDashboard(UUID resourceGroupId, UUID agentId, UUID dashboardId,
                                 CreateDashboardRequest request) {
         agentRepository.findById(agentId)

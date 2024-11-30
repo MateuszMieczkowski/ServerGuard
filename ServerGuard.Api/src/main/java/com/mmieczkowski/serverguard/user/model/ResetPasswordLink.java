@@ -16,7 +16,7 @@ public class ResetPasswordLink {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     private User user;
 
     @Column(nullable = false)

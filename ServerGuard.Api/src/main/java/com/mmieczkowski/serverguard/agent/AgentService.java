@@ -12,6 +12,7 @@ import com.mmieczkowski.serverguard.agent.response.GetAgentsPaginatedResponse;
 import com.mmieczkowski.serverguard.annotation.ResourceGroupAccess;
 import com.mmieczkowski.serverguard.resourcegroup.ResourceGroupRepository;
 import com.mmieczkowski.serverguard.resourcegroup.exception.ResourceGroupNotFoundException;
+import com.mmieczkowski.serverguard.resourcegroup.model.ResourceGroupUserRole;
 import com.mmieczkowski.serverguard.service.SecureRandomString;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -31,7 +32,7 @@ public class AgentService {
     }
 
     @Transactional
-    @ResourceGroupAccess
+    @ResourceGroupAccess(roles = {ResourceGroupUserRole.USER, ResourceGroupUserRole.ADMIN})
     public CreateAgentResponse createAgent(UUID resourceGroupId, CreateAgentRequest request) {
         var resourceGroup = ResourceGroupRepository.findById(resourceGroupId)
                 .orElseThrow(() -> new ResourceGroupNotFoundException(resourceGroupId));
@@ -42,7 +43,7 @@ public class AgentService {
         return new CreateAgentResponse(agent.getId(), agent.getName());
     }
 
-    @ResourceGroupAccess
+    @ResourceGroupAccess(roles = {ResourceGroupUserRole.USER, ResourceGroupUserRole.ADMIN})
     public GetAgentResponse getAgent(UUID resourceGroupId, UUID agentId) {
         Agent agent = agentRepository.findById(agentId)
                 .orElseThrow(AgentNotFoundException::new);
@@ -50,7 +51,7 @@ public class AgentService {
         return new GetAgentResponse(agent.getId(), agent.getName(), agentConfig, agent.getLastContactAt());
     }
 
-    @ResourceGroupAccess
+    @ResourceGroupAccess(roles = {ResourceGroupUserRole.USER, ResourceGroupUserRole.ADMIN})
     public void updateAgent(UUID resourceGroupId, UUID agentId, UpdateAgentRequest request) {
         Agent agent = agentRepository.findById(agentId)
                 .orElseThrow(AgentNotFoundException::new);
@@ -61,7 +62,7 @@ public class AgentService {
         agentRepository.save(agent);
     }
 
-    @ResourceGroupAccess
+    @ResourceGroupAccess(roles = {ResourceGroupUserRole.USER, ResourceGroupUserRole.ADMIN})
     public GetAgentsPaginatedResponse getAgentsPaginated(UUID resourceGroupId, GetAgentsPaginatedRequest request) {
         var pageable = PageRequest.of(request.pageNumber(), request.pageSize())
                 .withSort(Sort.by("name"));
@@ -75,7 +76,7 @@ public class AgentService {
                 agentsPage.getTotalPages());
     }
 
-    @ResourceGroupAccess
+    @ResourceGroupAccess(roles = {ResourceGroupUserRole.USER, ResourceGroupUserRole.ADMIN})
     public void deleteAgent(UUID resourceGroupId, UUID agentId) {
         var agentOptional = agentRepository.findById(agentId);
         if (agentOptional.isEmpty()) {

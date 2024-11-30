@@ -9,6 +9,7 @@ import com.mmieczkowski.serverguard.metric.model.AvailableMetric;
 import com.mmieczkowski.serverguard.metric.model.Metric;
 import com.mmieczkowski.serverguard.metric.model.MetricType;
 import jakarta.annotation.PostConstruct;
+import org.intellij.lang.annotations.Language;
 import org.springframework.stereotype.Repository;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -168,7 +169,7 @@ public class ClickHouseMetricRepository implements MetricRepository {
                                               Duration fromNow,
                                               String aggregateFunction) {
         String query = """
-                select %s(m.value) from metric m
+                select toFloat64(%s(m.value)) from metric m
                 where m.agent_id = {agentId:String}
                   AND m.sensor_name =  {sensorName:String}
                   AND m.metric_name = {metricName:String}
@@ -189,7 +190,7 @@ public class ClickHouseMetricRepository implements MetricRepository {
             }
             ClickHouseBinaryFormatReader reader = Client.newBinaryFormatReader(queryResponse);
             reader.next();
-            return reader.getFloat(1);
+            return reader.getDouble(1);
 
         } catch (Exception e) {
             throw new RuntimeException(e);

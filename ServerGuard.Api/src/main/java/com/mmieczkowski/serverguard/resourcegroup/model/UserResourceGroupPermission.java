@@ -24,11 +24,11 @@ public class UserResourceGroupPermission implements GrantedAuthority {
     @EmbeddedId
     private UserResourceGroupPermissionPK id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @MapsId("userId")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @MapsId("resourceGroupId")
     private ResourceGroup resourceGroup;
 
@@ -48,7 +48,11 @@ public class UserResourceGroupPermission implements GrantedAuthority {
         return this.resourceGroup;
     }
 
-    public void setResourceGroup(ResourceGroup resourceGroup) {
-        this.resourceGroup = resourceGroup;
+    public User getUser() {
+        return this.user;
+    }
+
+    public ResourceGroupUserRole getRole() {
+        return this.role;
     }
 }

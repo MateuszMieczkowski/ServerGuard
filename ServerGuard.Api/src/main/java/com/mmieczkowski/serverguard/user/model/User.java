@@ -28,7 +28,7 @@ public class User implements UserDetails {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
     private List<UserResourceGroupPermission> permissions;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<ResetPasswordLink> resetPasswordLinks;
 
     public User() {

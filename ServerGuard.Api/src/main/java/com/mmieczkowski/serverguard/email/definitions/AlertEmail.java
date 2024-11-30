@@ -18,7 +18,7 @@ public class AlertEmail extends EmailDefinition {
     }
     @Override
     public String getTemplateFileName() {
-        return "alertEmailTemplate";
+        return "alertEmail";
     }
 
     @Override

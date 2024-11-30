@@ -10,6 +10,7 @@ import com.mmieczkowski.serverguard.alert.request.GetAlertsPageRequest;
 import com.mmieczkowski.serverguard.alert.response.GetAlertLogsPageResponse;
 import com.mmieczkowski.serverguard.alert.response.GetAlertsPageResponse;
 import com.mmieczkowski.serverguard.annotation.ResourceGroupAccess;
+import com.mmieczkowski.serverguard.resourcegroup.model.ResourceGroupUserRole;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -31,7 +32,8 @@ public class AlertService {
         this.alertRepository = alertRepository;
         this.alertLogRepository = alertLogRepository;
     }
-    @ResourceGroupAccess
+
+    @ResourceGroupAccess(roles = {ResourceGroupUserRole.USER, ResourceGroupUserRole.ADMIN})
     public void createAlert(UUID resourceGroupId, UUID agentId, CreateAlertRequest request) {
         Agent agent = agentRepository.findById(agentId)
                 .orElseThrow(AgentNotFoundException::new);
@@ -43,7 +45,7 @@ public class AlertService {
         alertRepository.save(alert);
     }
 
-    @ResourceGroupAccess
+    @ResourceGroupAccess(roles = {ResourceGroupUserRole.USER, ResourceGroupUserRole.ADMIN})
     public GetAlertLogsPageResponse getAlertLogsPage(UUID resourceGroupId, UUID agentId, GetAlertLogsPageRequest request) {
         Agent agent = agentRepository.findById(agentId)
                 .orElseThrow(AgentNotFoundException::new);
@@ -68,7 +70,7 @@ public class AlertService {
         return new GetAlertLogsPageResponse(responsePage);
     }
 
-    @ResourceGroupAccess
+    @ResourceGroupAccess(roles = {ResourceGroupUserRole.USER, ResourceGroupUserRole.ADMIN})
     public void deleteAlert(UUID resourceGroupId, UUID agentId, UUID alertId) {
         agentRepository.findById(agentId)
                 .orElseThrow(AgentNotFoundException::new);
@@ -79,7 +81,7 @@ public class AlertService {
         alertRepository.delete(optionalAlert.get());
     }
 
-    @ResourceGroupAccess
+    @ResourceGroupAccess(roles = {ResourceGroupUserRole.USER, ResourceGroupUserRole.ADMIN})
     public GetAlertsPageResponse getAlertsPage(UUID resourceGroupId, UUID agentId, GetAlertsPageRequest request) {
         Agent agent = agentRepository.findById(agentId)
                 .orElseThrow(AgentNotFoundException::new);

@@ -1,15 +1,22 @@
 package com.mmieczkowski.serverguard.resourcegroup.model;
 
+import com.mmieczkowski.serverguard.resourcegroup.exception.ResourceGroupInvitationNotFoundException;
+import com.mmieczkowski.serverguard.user.model.User;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.util.Assert;
 
+import java.time.Clock;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -24,13 +31,18 @@ public class ResourceGroup {
     private String name;
 
     @CreatedDate
+    @Column(nullable = false)
     private Instant createdDate;
 
     @LastModifiedDate
     private Instant lastModifiedDate;
 
-    @OneToMany(mappedBy = "resourceGroup")
-    private List<UserResourceGroupPermission> userResourceGroupPermissions;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "resourceGroup")
+    private final List<UserResourceGroupPermission> userResourceGroupPermissions = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "resource_group_id", nullable = false)
+    private final List<ResourceGroupInvitation> resourceGroupInvitations = new ArrayList<>();
 
     @Column(nullable = false)
     private final boolean isDeleted = false;
@@ -54,5 +66,36 @@ public class ResourceGroup {
 
     public String getName() {
         return this.name;
+    }
+
+    public ResourceGroupInvitation createInvitation(String email, ResourceGroupUserRole role, Clock clock)
+    {
+        ResourceGroupInvitation invitation = new ResourceGroupInvitation(email, role, clock);
+        this.resourceGroupInvitations.add(invitation);
+        return invitation;
+    }
+
+    public void acceptInvitation(String token, User user, Clock clock){
+        if(user.hasAccessToResourceGroup(this.id)){
+            return;
+        }
+        Optional<ResourceGroupInvitation> optionalResourceGroupInvitation = resourceGroupInvitations.stream()
+                .filter(invitation -> invitation.getToken().equals(token))
+                .findFirst();
+        if (optionalResourceGroupInvitation.isEmpty()) {
+            throw new ResourceGroupInvitationNotFoundException();
+        }
+        ResourceGroupInvitation resourceGroupInvitation = optionalResourceGroupInvitation.get();
+        resourceGroupInvitation.accept(clock);
+        addUser(user, resourceGroupInvitation.getRole());
+    }
+
+    public void addUser(User user, ResourceGroupUserRole resourceGroupUserRole) {
+        var userResourceGroupPermission = new UserResourceGroupPermission(this, user, resourceGroupUserRole);
+        userResourceGroupPermissions.add(userResourceGroupPermission);
+    }
+
+    public void removeUser(UUID userId) {
+        userResourceGroupPermissions.removeIf(x -> x.getUser().getId().equals(userId));
     }
 }
