@@ -1,4 +1,3 @@
-import { InvalidTokenError } from "jwt-decode";
 import getConfig from "../config";
 import axiosInstance from "./axios-instance";
 import { Page } from "./Page";

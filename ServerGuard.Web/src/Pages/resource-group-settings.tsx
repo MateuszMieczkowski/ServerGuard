@@ -51,7 +51,7 @@ export const ResourceGroupSettingsPage = () => {
     page: 0,
     pageSize: 10,
   });
-  const [resourceGroupName, setResourceGroupName] = useState("");
+  const [_, setResourceGroupName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [refreshUsers, setRefreshUsers] = useState(false);
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
