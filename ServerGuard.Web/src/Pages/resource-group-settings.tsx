@@ -25,6 +25,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { debounce } from "lodash";
 import InviteUserDialog from "../components/invite-user-dialog";
 import { getCurrentUserEmail } from "../util";
+import { deleteConfirmationDialog } from "../components/delete-confirmation-dialog";
 
 interface ToolbarProps {
   onClick: () => void;
@@ -55,6 +56,8 @@ export const ResourceGroupSettingsPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [refreshUsers, setRefreshUsers] = useState(false);
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDeleteId, setUserToDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!resourceGroupId) {
@@ -84,7 +87,6 @@ export const ResourceGroupSettingsPage = () => {
       return;
     }
     await deleteUser(resourceGroupId, userId);
-    setRefreshUsers(!refreshUsers);
   };
 
   const handleSubmit = useCallback(
@@ -224,7 +226,10 @@ export const ResourceGroupSettingsPage = () => {
                     <IconButton
                       aria-label="delete"
                       sx={{ m: 0, p: 0 }}
-                      onClick={() => removeUser(value.row.id)}
+                      onClick={() => {
+                        setUserToDeleteId(value.row.id);
+                        setDeleteDialogOpen(true);
+                      }}
                     >
                       <DeleteIcon />
                     </IconButton>
@@ -240,6 +245,19 @@ export const ResourceGroupSettingsPage = () => {
         isOpen={inviteDialogOpen}
         setOpen={setInviteDialogOpen}
       />
+      {deleteConfirmationDialog(
+        "Resource Group User",
+        deleteDialogOpen,
+        () => {
+          setUserToDeleteId(null);
+          setDeleteDialogOpen(false);
+        },
+        () => {
+          removeUser(userToDeleteId ?? "").then(() => {
+            setRefreshUsers(!refreshUsers);
+          });
+        }
+      )}
     </Container>
   );
 };
