@@ -1,11 +1,14 @@
 package com.mmieczkowski.serverguard.user.service;
 
+import com.mmieczkowski.serverguard.service.CurrentUserService;
+import com.mmieczkowski.serverguard.user.UserNotFoundException;
 import com.mmieczkowski.serverguard.user.repository.UserRepository;
 import com.mmieczkowski.serverguard.user.request.LoginRequest;
 import com.mmieczkowski.serverguard.user.response.LoginResponse;
 import com.mmieczkowski.serverguard.user.request.RegisterRequest;
 import com.mmieczkowski.serverguard.user.response.RegisterResponse;
 import com.mmieczkowski.serverguard.user.model.User;
+import com.mmieczkowski.serverguard.user.response.UserProfileResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -23,16 +27,18 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final CurrentUserService currentUserService;
 
     public UserService(
             AuthTokenService authTokenService,
             AuthenticationManager authenticationManager,
             PasswordEncoder passwordEncoder,
-            UserRepository userRepository) {
+            UserRepository userRepository, CurrentUserService currentUserService) {
         this.authTokenService = authTokenService;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
+        this.currentUserService = currentUserService;
     }
 
     public LoginResponse login(LoginRequest loginRequest) {
@@ -55,5 +61,11 @@ public class UserService {
             return new RegisterResponse(false);
         }
         return new RegisterResponse(true);
+    }
+
+    public UserProfileResponse getUserProfile() {
+        User user = currentUserService.getLoggedInUser().orElseThrow();
+        return new UserProfileResponse(user.getId(), user.getUsername(), user.getPermissions()
+                .map(x -> new UserProfileResponse.ResourceGroupPermission(x.getId().getResourceGroupId(), x.getRole()) ).toList());
     }
 }

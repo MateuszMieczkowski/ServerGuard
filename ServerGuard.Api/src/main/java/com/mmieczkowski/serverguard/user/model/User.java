@@ -10,6 +10,7 @@ import java.time.Clock;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Entity
 @Table(name = "app_user")
@@ -78,5 +79,9 @@ public class User implements UserDetails {
                 .filter(link -> link.getToken().equals(token))
                 .findFirst()
                 .ifPresent(x -> x.markAsUsed(clock));
+    }
+
+    public Stream<UserResourceGroupPermission> getPermissions() {
+        return permissions.stream();
     }
 }

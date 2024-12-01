@@ -3,11 +3,8 @@ package com.mmieczkowski.serverguard.resourcegroup;
 import com.mmieczkowski.serverguard.resourcegroup.request.CreateResourceGroupInvitationRequest;
 import com.mmieczkowski.serverguard.resourcegroup.request.CreateResourceGroupRequest;
 import com.mmieczkowski.serverguard.resourcegroup.request.GetResourceGroupUsersPageRequest;
-import com.mmieczkowski.serverguard.resourcegroup.response.CreateResourceGroupResponse;
-import com.mmieczkowski.serverguard.resourcegroup.response.GetResourceGroupResponse;
+import com.mmieczkowski.serverguard.resourcegroup.response.*;
 import com.mmieczkowski.serverguard.resourcegroup.request.GetResourceGroupPaginatedRequest;
-import com.mmieczkowski.serverguard.resourcegroup.response.GetResourceGroupPaginatedResponse;
-import com.mmieczkowski.serverguard.resourcegroup.response.GetResourceGroupUsersPageResponse;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
@@ -60,6 +57,11 @@ public class ResourceGroupController {
     @PostMapping("{id}/invitations/{token}")
     public void acceptResourceGroupInvitation(@PathVariable UUID id, @PathVariable String token) {
         resourceGroupService.acceptResourceGroupInvitation(id, token);
+    }
+
+    @GetMapping("{id}/invitations/{token}")
+    public GetResourceGroupInvitationResponse getResourceGroupInvitation(@PathVariable UUID id, @PathVariable String token) {
+        return resourceGroupService.getResourceGroupInvitation(id, token);
     }
 
     @GetMapping("{id}/users")

@@ -37,7 +37,7 @@ public class ResourceGroup {
     @LastModifiedDate
     private Instant lastModifiedDate;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "resourceGroup")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "resourceGroup", orphanRemoval = true)
     private final List<UserResourceGroupPermission> userResourceGroupPermissions = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL)
@@ -97,5 +97,12 @@ public class ResourceGroup {
 
     public void removeUser(UUID userId) {
         userResourceGroupPermissions.removeIf(x -> x.getUser().getId().equals(userId));
+    }
+
+    public ResourceGroupInvitation getInvitation(String token) {
+        return resourceGroupInvitations.stream()
+                .filter(invitation -> invitation.getToken().equals(token))
+                .findFirst()
+                .orElseThrow(ResourceGroupInvitationNotFoundException::new);
     }
 }

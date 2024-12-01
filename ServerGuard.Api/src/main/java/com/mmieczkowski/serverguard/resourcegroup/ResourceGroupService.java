@@ -4,6 +4,7 @@ import com.mmieczkowski.serverguard.annotation.ResourceGroupAccess;
 import com.mmieczkowski.serverguard.config.properties.WebProperties;
 import com.mmieczkowski.serverguard.email.EmailService;
 import com.mmieczkowski.serverguard.email.definitions.ResourceGroupInvitationEmail;
+import com.mmieczkowski.serverguard.resourcegroup.exception.CannotDeleteYourselfException;
 import com.mmieczkowski.serverguard.resourcegroup.model.ResourceGroup;
 import com.mmieczkowski.serverguard.resourcegroup.model.ResourceGroupInvitation;
 import com.mmieczkowski.serverguard.resourcegroup.model.ResourceGroupUserRole;
@@ -11,6 +12,7 @@ import com.mmieczkowski.serverguard.resourcegroup.request.CreateResourceGroupInv
 import com.mmieczkowski.serverguard.resourcegroup.request.CreateResourceGroupRequest;
 import com.mmieczkowski.serverguard.resourcegroup.response.CreateResourceGroupResponse;
 import com.mmieczkowski.serverguard.resourcegroup.exception.ResourceGroupNotFoundException;
+import com.mmieczkowski.serverguard.resourcegroup.response.GetResourceGroupInvitationResponse;
 import com.mmieczkowski.serverguard.resourcegroup.response.GetResourceGroupResponse;
 import com.mmieczkowski.serverguard.resourcegroup.request.GetResourceGroupPaginatedRequest;
 import com.mmieczkowski.serverguard.resourcegroup.response.GetResourceGroupPaginatedResponse;
@@ -96,7 +98,7 @@ public class ResourceGroupService {
         ResourceGroupInvitation invitation = resourceGroup.createInvitation(request.email(), request.role(), clock);
         resourceGroupRepository.save(resourceGroup);
         var invitationEmail = new ResourceGroupInvitationEmail(invitation.getEmail(),
-                invitation.constructLink(webProperties.url()),
+                invitation.constructLink(webProperties.url() + "/resourceGroups/" + id),
                 resourceGroup.getName(),
                 invitation.getRole());
         try {
@@ -106,7 +108,6 @@ public class ResourceGroupService {
         }
     }
 
-    @ResourceGroupAccess(value = "id", roles = {ResourceGroupUserRole.USER, ResourceGroupUserRole.ADMIN})
     public void acceptResourceGroupInvitation(UUID id, String token) {
         ResourceGroup resourceGroup = resourceGroupRepository.findById(id)
                 .orElseThrow(() -> new ResourceGroupNotFoundException(id));
@@ -118,9 +119,19 @@ public class ResourceGroupService {
 
     @ResourceGroupAccess(value = "id", roles = {ResourceGroupUserRole.ADMIN})
     public void removeUserFromResourceGroup(UUID id, UUID userId) {
+        if(currentUserService.getLoggedInUser().map(user -> user.getId().equals(userId)).orElse(false)){
+            throw new CannotDeleteYourselfException();
+        }
         ResourceGroup resourceGroup = resourceGroupRepository.findById(id)
                 .orElseThrow(() -> new ResourceGroupNotFoundException(id));
         resourceGroup.removeUser(userId);
         resourceGroupRepository.save(resourceGroup);
+    }
+
+    public GetResourceGroupInvitationResponse getResourceGroupInvitation(UUID id, String token) {
+        ResourceGroup resourceGroup  = resourceGroupRepository.findById(id)
+                .orElseThrow(() -> new ResourceGroupNotFoundException(id));
+        ResourceGroupInvitation invitation = resourceGroup.getInvitation(token);
+        return new GetResourceGroupInvitationResponse(invitation.getEmail(), invitation.getRole(), resourceGroup.getName());
     }
 }

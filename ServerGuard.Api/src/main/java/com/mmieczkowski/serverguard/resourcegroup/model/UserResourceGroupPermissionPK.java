@@ -50,4 +50,8 @@ public class UserResourceGroupPermissionPK implements Serializable {
         result = result * PRIME + ($resourceGroupId == null ? 43 : $resourceGroupId.hashCode());
         return result;
     }
+
+    public UUID getResourceGroupId() {
+        return this.resourceGroupId;
+    }
 }

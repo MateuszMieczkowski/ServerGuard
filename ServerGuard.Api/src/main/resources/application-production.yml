@@ -3,3 +3,6 @@ spring:
     add-properties: false
   config:
     import: optional:secrets.yml
+
+web:
+  url: http://65.109.225.191

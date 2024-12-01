@@ -14,3 +14,15 @@ export const isAuthenticated = () => {
     }
     return true;
 }
+
+export const getCurrentUserEmail = () => {
+    var jwtToken = localStorage.getItem("authToken");
+    if(jwtToken === null) {
+        return null;
+    }
+    var jwt = jwtDecode(jwtToken);
+    if(jwt === null) {
+        return null;
+    }
+    return jwt.sub;
+}

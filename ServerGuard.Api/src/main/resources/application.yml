@@ -14,7 +14,7 @@ spring:
     virtual:
       enabled: true
   profiles:
-    active: production
+    active: development
 
 rsa:
   private-key: classpath:certs/private.pem
@@ -30,6 +30,3 @@ logging:
       file-name-pattern: ${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz
       clean-history-on-start: false
       max-history: 30
-
-web:
-  url: http://65.109.225.191

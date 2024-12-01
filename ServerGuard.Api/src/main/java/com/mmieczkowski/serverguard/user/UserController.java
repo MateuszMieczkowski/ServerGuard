@@ -6,10 +6,13 @@ import com.mmieczkowski.serverguard.user.request.ResetPasswordRequest;
 import com.mmieczkowski.serverguard.user.response.LoginResponse;
 import com.mmieczkowski.serverguard.user.request.RegisterRequest;
 import com.mmieczkowski.serverguard.user.response.RegisterResponse;
+import com.mmieczkowski.serverguard.user.response.UserProfileResponse;
 import com.mmieczkowski.serverguard.user.service.ResetPasswordLinkService;
 import com.mmieczkowski.serverguard.user.service.UserService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/users")
@@ -45,5 +48,10 @@ public class UserController {
     @ResponseBody
     public void resetPassword(@Validated @RequestBody ResetPasswordRequest request) {
         resetPasswordLinkService.reset(request);
+    }
+
+    @GetMapping("profile")
+    public UserProfileResponse getUser() {
+        return userService.getUserProfile();
     }
 }

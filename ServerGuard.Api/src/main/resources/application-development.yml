@@ -6,6 +6,8 @@ spring:
     password: mysecretpassword
   devtools:
     add-properties: true
+  config:
+    import: optional:secrets.yml
 
 clickhouse:
   password: mysecretpassword
@@ -14,3 +16,8 @@ clickhouse:
 
 web:
   url: http://localhost:5173
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /swagger-ui.html

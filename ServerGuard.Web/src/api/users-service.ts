@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import getConfig from "../config";
 import axios from 'axios';
+import axiosInstance from "./axios-instance";
 
 const config = getConfig();
 
@@ -94,5 +95,31 @@ export async function resetPassword(token: string, newPassword: string): Promise
     } catch (error) {
         console.error('Reset password failed:', error);
         return false;
+    }
+}
+
+export interface UserProfile {
+    id: string;
+    email: string;
+    resourceGroupPermissions: ResoureGroupPermission[];
+}
+
+export interface ResoureGroupPermission {
+    id: string;
+    role: string;
+}
+
+export async function getUserProfile(): Promise<UserProfile> {
+    try {
+        const response = await axiosInstance.get(`${config.apiUrl}/users/profile`);
+
+        if (response.status !== 200) {
+            throw new Error('Failed to get user profile');
+        }
+
+        return response.data;
+    } catch (error) {
+        console.error('Failed to get profile', error);
+        throw error;
     }
 }

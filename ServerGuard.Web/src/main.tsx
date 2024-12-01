@@ -24,6 +24,7 @@ import { ResourceGroupSettingsPage } from "./Pages/resource-group-settings.tsx";
 import { AlertsPage } from "./Pages/alerts-page.tsx";
 import ForgotPasswordPage from "./Pages/forgot-password-page.tsx";
 import ResetPasswordPage from "./Pages/reset-password-page.tsx";
+import { InvitationPage } from "./Pages/invitation-page.tsx";
 
 const router = createBrowserRouter([
   {
@@ -46,6 +47,10 @@ const router = createBrowserRouter([
       {
         path: "/resourceGroups/:resourceGroupId/agents/:agentId/alerts",
         element: <AlertsPage />,
+      },
+      {
+        path: "/resourceGroups/:resourceGroupId/accept-invitation",
+        element: <InvitationPage />,
       },
     ],
   },

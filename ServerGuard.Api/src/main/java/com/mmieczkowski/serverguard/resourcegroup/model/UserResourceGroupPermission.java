@@ -2,11 +2,12 @@ package com.mmieczkowski.serverguard.resourcegroup.model;
 
 import com.mmieczkowski.serverguard.user.model.User;
 import jakarta.persistence.*;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.SoftDelete;
 import org.springframework.security.core.GrantedAuthority;
 
 @Entity
-@SQLRestriction("is_deleted = false")
 public class UserResourceGroupPermission implements GrantedAuthority {
 
     public UserResourceGroupPermission() {
@@ -36,9 +37,6 @@ public class UserResourceGroupPermission implements GrantedAuthority {
     @Column(nullable = false)
     private ResourceGroupUserRole role;
 
-    @Column(nullable = false)
-    private final boolean isDeleted = false;
-
     @Override
     public String getAuthority() {
         return String.format("resourceGroup_%s_%s", resourceGroup.getId(), role.toString());
@@ -54,5 +52,9 @@ public class UserResourceGroupPermission implements GrantedAuthority {
 
     public ResourceGroupUserRole getRole() {
         return this.role;
+    }
+
+    public UserResourceGroupPermissionPK getId() {
+        return this.id;
     }
 }

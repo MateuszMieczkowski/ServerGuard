@@ -1,5 +1,7 @@
+import { InvalidTokenError } from "jwt-decode";
 import getConfig from "../config";
 import axiosInstance from "./axios-instance";
+import { Page } from "./Page";
 
 const config = getConfig();
 
@@ -80,3 +82,91 @@ export const updateResourceGroup = async (resourceGroupId: string, name: string)
         throw error;
     }
 }
+
+export interface User {
+    id: string;
+    email: string;
+    role: string;
+}
+
+export const getUsers = async (resourceGroupId: string, pageNumber: number, pageSize: number) : Promise<Page<User>> => {
+    try {
+        const response = await axiosInstance.get(`${config.apiUrl}/resourceGroups/${resourceGroupId}/users?pageNumber=${pageNumber}&pageSize=${pageSize}`);
+
+        if (response.status !== 200) {
+            throw new Error('Failed to get users');
+        }
+
+        return response.data.users;
+    } catch (error) {
+        console.error("Failed to get users", error);
+        throw error;
+    }
+ }
+
+ export const deleteUser = async (resourceGroupId: string, userId: string) => {
+    try {
+        const response = await axiosInstance.delete(`${config.apiUrl}/resourceGroups/${resourceGroupId}/users/${userId}`);
+
+        if (response.status !== 200) {
+            throw new Error('Failed to delete user');
+        }
+        return;
+    } catch (error) {
+        console.error("Failed to delete user", error);
+        throw error;
+    }
+ }
+
+ export const inviteUser = async (resourceGroupId: string, email: string, role: string) => {
+    try {
+        const response = await axiosInstance.post(`${config.apiUrl}/resourceGroups/${resourceGroupId}/invitations`, {email, role}, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.status !== 200) {
+            throw new Error('Failed to invite user');
+        }
+        return;
+    } catch (error) {
+        console.error("Failed to invite user", error);
+        throw error;
+    }
+ }
+
+ export interface Invitation {
+    email: string;
+    role: string;
+    resourceGroupName: string;
+ }
+
+ export const getInvitation = async (resourceGroupId: string, token: string) : Promise<Invitation> => {
+    try {
+        const response = await axiosInstance.get(`${config.apiUrl}/resourceGroups/${resourceGroupId}/invitations/${token}`);
+
+        if (response.status !== 200) {
+            throw new Error('Failed to get invitation');
+        }
+
+        return response.data;
+    } catch (error) {
+        console.error("Failed to get invitation", error);
+        throw error;
+    }
+ }
+
+ export const acceptInvitation = async (resourceGroupId: string, token: string) => {
+    try {
+        const response = await axiosInstance.post(`${config.apiUrl}/resourceGroups/${resourceGroupId}/invitations/${token}`);
+
+        if (response.status !== 200) {
+            throw new Error('Failed to accept invitation');
+        }
+        return;
+    } catch (error) {
+        console.error("Failed to accept invitation", error);
+        throw error;
+    }
+ }

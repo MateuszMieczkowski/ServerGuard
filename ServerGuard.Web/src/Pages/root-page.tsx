@@ -27,6 +27,7 @@ import {
   GetResourceGroupsResponse,
 } from "../api/resource-group-service";
 import { isAuthenticated } from "../util";
+import { getUserProfile, UserProfile } from "../api/users-service";
 
 const drawerWidth = 240;
 
@@ -49,6 +50,8 @@ const RootPage = () => {
   const [getResourceGroupsResponse, setGetResourceGroupsResponse] =
     useState<GetResourceGroupsResponse | null>(null);
 
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
   useEffect(() => {
     getResourceGroups(currentPage - 1, 10).then((response) => {
       setGetResourceGroupsResponse(response);
@@ -57,6 +60,9 @@ const RootPage = () => {
         acc[group.id] = false;
         return acc;
       }, {} as { [key: string]: boolean });
+      getUserProfile().then((profile) => {
+        setUserProfile(profile);
+      });
       setOpenStates(initialOpenStates);
     });
   }, [refreshResourceGroups, currentPage]);
@@ -140,17 +146,21 @@ const RootPage = () => {
                             </ListItemIcon>
                             <ListItemText primary="Agents" />
                           </ListItemButton>
-                          <ListItemButton
-                            sx={{ pl: 4 }}
-                            onClick={() =>
-                              navigate(`/resourceGroups/${group.id}/settings`)
-                            }
-                          >
-                            <ListItemIcon>
-                              <AdminPanelSettingsOutlinedIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Settings" />
-                          </ListItemButton>
+                          {userProfile?.resourceGroupPermissions.find(
+                            (x) => x.id === group.id
+                          )?.role === "ADMIN" && (
+                            <ListItemButton
+                              sx={{ pl: 4 }}
+                              onClick={() =>
+                                navigate(`/resourceGroups/${group.id}/settings`)
+                              }
+                            >
+                              <ListItemIcon>
+                                <AdminPanelSettingsOutlinedIcon />
+                              </ListItemIcon>
+                              <ListItemText primary="Settings" />
+                            </ListItemButton>
+                          )}
                         </List>
                       </Collapse>
                       <Divider />
