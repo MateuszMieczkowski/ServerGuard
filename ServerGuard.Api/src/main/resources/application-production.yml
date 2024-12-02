@@ -5,4 +5,4 @@ spring:
     import: optional:secrets.yml
 
 web:
-  url: http://65.109.225.191
+  url: http://serverguard.tech
