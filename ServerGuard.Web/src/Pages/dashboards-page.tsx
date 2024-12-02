@@ -453,10 +453,6 @@ const DashboardsPage = () => {
                           />
                           <YAxis
                             type="number"
-                            domain={[
-                              (dataMin: any) => dataMin,
-                              (dataMax: any) => dataMax * 1.1,
-                            ]}
                             tickCount={10}
                             unit={graph.unit}
                           />
