@@ -16,6 +16,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.time.Clock;
+import java.util.Properties;
 
 @Configuration
 @EnableCaching
@@ -51,6 +52,9 @@ public class Config {
     @Bean
     public JavaMailSender mailSender(SmtpProperties properties) {
         var mailSender = new JavaMailSenderImpl();
+        var props = new Properties();
+        props.put("mail.smtp.starttls.enable", "true");
+        mailSender.setJavaMailProperties(props);
         mailSender.setHost(properties.host());
         mailSender.setPort(properties.port());
         mailSender.setUsername(properties.username());

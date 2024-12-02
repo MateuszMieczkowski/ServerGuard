@@ -1,5 +1,6 @@
 package com.mmieczkowski.serverguard.email;
 
+import com.mmieczkowski.serverguard.config.properties.SmtpProperties;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -11,10 +12,12 @@ import java.io.IOException;
 public class EmailServiceImpl implements EmailService {
     private final JavaMailSender mailSender;
     private final EmailTemplateProvider emailTemplateProvider;
+    private final SmtpProperties smtpProperties;
 
-    public EmailServiceImpl(JavaMailSender javaMailSender, EmailTemplateProvider emailTemplateProvider) {
+    public EmailServiceImpl(JavaMailSender javaMailSender, EmailTemplateProvider emailTemplateProvider, SmtpProperties smtpProperties) {
         this.mailSender = javaMailSender;
         this.emailTemplateProvider = emailTemplateProvider;
+        this.smtpProperties = smtpProperties;
     }
 
 
@@ -22,6 +25,7 @@ public class EmailServiceImpl implements EmailService {
     public void sendEmail(EmailDefinition emailDefinition) throws MessagingException, IOException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+        helper.setFrom(smtpProperties.username());
         helper.setTo(emailDefinition.getRecipients());
         helper.setSubject(emailDefinition.getSubject());
         String template = emailTemplateProvider.getTemplate(emailDefinition.getTemplateFileName());
