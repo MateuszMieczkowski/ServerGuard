@@ -25,6 +25,7 @@ builder.Services.AddSerilog((_, config) =>
     }
 });
 
+
 if (!RootChecker.IsRoot())
 {
     var errMsg = "Agent must be run as root";
