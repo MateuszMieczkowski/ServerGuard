@@ -8,6 +8,7 @@ using ServerGuard.Agent.Config;
 using Refit;
 using Microsoft.Extensions.Configuration;
 using System.Text.Json.Serialization;
+using ServerGuard.Agent.Dto;
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder();
 
@@ -52,6 +53,7 @@ static void AddIntegrationApi(HostApplicationBuilder builder)
 {
     var serializerOptions = SystemTextJsonContentSerializer.GetDefaultJsonSerializerOptions();
     serializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals;
+    serializerOptions.Converters.Add(new MetricTypeConverter());
     builder.Services
     .AddRefitClient<IIntegrationApi>(new RefitSettings()
     {
