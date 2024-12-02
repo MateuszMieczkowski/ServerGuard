@@ -45,7 +45,7 @@ public class ResourceGroup {
     private final List<ResourceGroupInvitation> resourceGroupInvitations = new ArrayList<>();
 
     @Column(nullable = false)
-    private final boolean isDeleted = false;
+    private boolean isDeleted = false;
 
     public ResourceGroup() {
     }
@@ -104,5 +104,10 @@ public class ResourceGroup {
                 .filter(invitation -> invitation.getToken().equals(token))
                 .findFirst()
                 .orElseThrow(ResourceGroupInvitationNotFoundException::new);
+    }
+
+    public void delete() {
+        this.isDeleted = true;
+        userResourceGroupPermissions.clear();
     }
 }

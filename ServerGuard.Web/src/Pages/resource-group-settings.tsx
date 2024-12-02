@@ -5,12 +5,14 @@ import {
   Box,
   Paper,
   IconButton,
+  Stack,
 } from "@mui/material";
 import { useFormik } from "formik";
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import * as Yup from "yup";
 import {
+  deleteResourceGroup,
   deleteUser,
   getResourceGroup,
   getUsers,
@@ -56,8 +58,10 @@ export const ResourceGroupSettingsPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [refreshUsers, setRefreshUsers] = useState(false);
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteUserDialogOpen, setDeleteUserDialogOpen] = useState(false);
   const [userToDeleteId, setUserToDeleteId] = useState<string | null>(null);
+  const [deleteResourceGroupDialogOpen, setDeleteResourceGroupDialogOpen] =
+    useState(false);
 
   useEffect(() => {
     if (!resourceGroupId) {
@@ -87,6 +91,12 @@ export const ResourceGroupSettingsPage = () => {
       return;
     }
     await deleteUser(resourceGroupId, userId);
+  };
+  const handleDeleteResourceGroup = async () => {
+    if (!resourceGroupId) {
+      return;
+    }
+    await deleteResourceGroup(resourceGroupId);
   };
 
   const handleSubmit = useCallback(
@@ -146,7 +156,9 @@ export const ResourceGroupSettingsPage = () => {
 
   return (
     <Container>
-      <Box
+      <Stack
+        direction="row"
+        spacing={2}
         sx={{
           display: "flex",
           justifyContent: "center",
@@ -154,7 +166,10 @@ export const ResourceGroupSettingsPage = () => {
         }}
       >
         <Typography variant="h5">Resource Group Settings</Typography>
-      </Box>
+        <IconButton onClick={() => setDeleteResourceGroupDialogOpen(true)}>
+          <DeleteIcon />
+        </IconButton>
+      </Stack>
       <Box
         component="form"
         onSubmit={formik.handleSubmit}
@@ -228,7 +243,7 @@ export const ResourceGroupSettingsPage = () => {
                       sx={{ m: 0, p: 0 }}
                       onClick={() => {
                         setUserToDeleteId(value.row.id);
-                        setDeleteDialogOpen(true);
+                        setDeleteUserDialogOpen(true);
                       }}
                     >
                       <DeleteIcon />
@@ -247,14 +262,26 @@ export const ResourceGroupSettingsPage = () => {
       />
       {deleteConfirmationDialog(
         "Resource Group User",
-        deleteDialogOpen,
+        deleteUserDialogOpen,
         () => {
           setUserToDeleteId(null);
-          setDeleteDialogOpen(false);
+          setDeleteUserDialogOpen(false);
         },
         () => {
           removeUser(userToDeleteId ?? "").then(() => {
             setRefreshUsers(!refreshUsers);
+          });
+        }
+      )}
+      {deleteConfirmationDialog(
+        "Resource Group",
+        deleteResourceGroupDialogOpen,
+        () => {
+          setDeleteResourceGroupDialogOpen(false);
+        },
+        () => {
+          handleDeleteResourceGroup().then(() => {
+            window.location.href = "/";
           });
         }
       )}

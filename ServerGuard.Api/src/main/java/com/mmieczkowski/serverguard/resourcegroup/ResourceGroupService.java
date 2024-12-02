@@ -79,7 +79,13 @@ public class ResourceGroupService {
 
     @ResourceGroupAccess(value = "id", roles = {ResourceGroupUserRole.ADMIN})
     public void deleteResourceGroup(UUID id) {
-        resourceGroupRepository.deleteById(id);
+        var resourceGroupOptional = resourceGroupRepository.findById(id);
+        if(resourceGroupOptional.isEmpty()){
+            return;
+        }
+        ResourceGroup resourceGroup = resourceGroupOptional.get();
+        resourceGroup.delete();
+        resourceGroupRepository.save(resourceGroup);
     }
 
     @ResourceGroupAccess(value = "id", roles = {ResourceGroupUserRole.ADMIN})

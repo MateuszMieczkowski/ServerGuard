@@ -24,14 +24,4 @@ public interface ResourceGroupRepository extends JpaRepository<ResourceGroup, UU
             FROM UserResourceGroupPermission up
                 JOIN User u ON up.user.id = u.id AND up.resourceGroup.id = :resourceGroupId""")
     List<String> findAllResourceGroupUserEmails(UUID resourceGroupId);
-
-    @Override
-    @Modifying
-    @Query("UPDATE ResourceGroup rg SET rg.isDeleted = true WHERE rg = :resourceGroup")
-    void delete(@NotNull ResourceGroup resourceGroup);
-
-    @Override
-    @Modifying
-    @Query("UPDATE ResourceGroup rg SET rg.isDeleted = true WHERE rg.id = :id")
-    void deleteById(@NotNull UUID id);
 }

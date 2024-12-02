@@ -169,3 +169,17 @@ export const getUsers = async (resourceGroupId: string, pageNumber: number, page
         throw error;
     }
  }
+
+ export const deleteResourceGroup = async (resourceGroupId: string) => {
+    try {
+        const response = await axiosInstance.delete(`${config.apiUrl}/resourceGroups/${resourceGroupId}`);
+
+        if (response.status !== 200) {
+            throw new Error('Failed to delete resource group');
+        }
+        return;
+    } catch (error) {
+        console.error("Failed to delete resource group", error);
+        throw error;
+    }
+ }
