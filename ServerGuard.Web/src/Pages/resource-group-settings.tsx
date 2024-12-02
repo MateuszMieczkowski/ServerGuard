@@ -84,7 +84,7 @@ export const ResourceGroupSettingsPage = () => {
     ).then((response) => {
       setUsersPage(response);
     });
-  }, [refreshUsers, usersPagination]);
+  }, [refreshUsers, usersPagination, resourceGroupId]);
 
   const removeUser = async (userId: string) => {
     if (!resourceGroupId) {
