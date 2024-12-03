@@ -1,10 +1,8 @@
 
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Quartz;
 using ServerGuard.Agent.Common;
 using ServerGuard.Agent.Config;
-using ServerGuard.Agent.Jobs;
 using ServerGuard.Agent.Services;
 
 internal class ApiAgentConfigProvider : IAgentConfigProvider

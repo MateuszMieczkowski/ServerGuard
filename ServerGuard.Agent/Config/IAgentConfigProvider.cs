@@ -1,6 +1,4 @@
-﻿using Quartz;
-
-namespace ServerGuard.Agent.Config;
+﻿namespace ServerGuard.Agent.Config;
 
 internal interface IAgentConfigProvider
 {

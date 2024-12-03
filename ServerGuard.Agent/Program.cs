@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using Quartz;
 using ServerGuard.Agent.Jobs;
 using Microsoft.Extensions.DependencyInjection;
 using ServerGuard.Agent.Services;
@@ -45,7 +44,7 @@ if (builder.Configuration.GetConnectionString("ApiUrl") is null || builder.Confi
 }
 
 builder.Services.AddMemoryCache();
-AddQuartz(builder);
+builder.Services.AddHostedService<CollectMetricsJob>();
 AddServices(builder);
 AddIntegrationApi(builder);
 
@@ -67,19 +66,6 @@ static void AddIntegrationApi(HostApplicationBuilder builder)
      .AddHttpMessageHandler(serviceProvider
         => new HttpLoggingHandler(serviceProvider.GetRequiredService<ILogger<HttpLoggingHandler>>()));
     builder.Services.AddSingleton<HttpLoggingHandler>(); ;
-}
-
-static void AddQuartz(HostApplicationBuilder builder)
-{
-    builder.Services.AddQuartz(config =>
-    {
-        config.AddJob<CollectMetricsJob>(j => j.WithIdentity(nameof(CollectMetricsJob)));
-        config.AddTrigger(t => t
-            .ForJob(nameof(CollectMetricsJob))
-            .WithIdentity($"{nameof(CollectMetricsJob)}Trigger")
-            .WithSimpleSchedule(schedule => schedule.WithInterval(TimeSpan.FromSeconds(1)).RepeatForever()));
-    });
-    builder.Services.AddQuartzHostedService(config => config.WaitForJobsToComplete = true);
 }
 
 static void AddServices(HostApplicationBuilder builder)

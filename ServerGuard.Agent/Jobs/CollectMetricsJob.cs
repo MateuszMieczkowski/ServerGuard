@@ -1,20 +1,19 @@
-using System.Text.Json;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Quartz;
 using ServerGuard.Agent.Config;
 using ServerGuard.Agent.Services;
 
 namespace ServerGuard.Agent.Jobs;
 
-[DisallowConcurrentExecution]
-internal sealed class CollectMetricsJob : IJob
+internal sealed class CollectMetricsJob : BackgroundService
 {
     private readonly ILogger<CollectMetricsJob> _logger;
     private readonly IMetricCollector _metricCollector;
     private readonly IAgentConfigProvider _agentConfigProvider;
     private readonly IIntegrationApi _integrationApi;
     private readonly IConfiguration _configuration;
+
     public CollectMetricsJob(
         ILogger<CollectMetricsJob> logger,
         IMetricCollector metricCollector,
@@ -29,13 +28,16 @@ internal sealed class CollectMetricsJob : IJob
         _configuration = configuration;
     }
 
-    public async Task Execute(IJobExecutionContext context)
+    protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Collecting metrics...");
-        var agentConfig = await _agentConfigProvider.GetAsync(context.CancellationToken);
-        var metrics = await _metricCollector.CollectAsync();
-        await _integrationApi.SendMetrics(_configuration.GetValue<string>("ApiKey")!, agentConfig.ResourceGroupId, agentConfig.AgentId, metrics, context.CancellationToken);
-        _logger.LogInformation("Metrics collected");
-        await Task.Delay(TimeSpan.FromSeconds(agentConfig.CollectEverySeconds), context.CancellationToken);
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            _logger.LogInformation("Collecting metrics...");
+            var agentConfig = await _agentConfigProvider.GetAsync(cancellationToken);
+            var metrics = await _metricCollector.CollectAsync();
+            await _integrationApi.SendMetrics(_configuration.GetValue<string>("ApiKey")!, agentConfig.ResourceGroupId, agentConfig.AgentId, metrics, cancellationToken);
+            _logger.LogInformation("Metrics collected");
+            await Task.Delay(TimeSpan.FromSeconds(agentConfig.CollectEverySeconds), cancellationToken);
+        }
     }
 }
