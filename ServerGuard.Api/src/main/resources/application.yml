@@ -14,7 +14,7 @@ spring:
     virtual:
       enabled: true
   profiles:
-    active: production
+    active: development
 
 rsa:
   private-key: classpath:certs/private.pem

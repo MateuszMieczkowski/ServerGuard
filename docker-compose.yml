@@ -1,6 +1,8 @@
 services:
   serverguard.api:
     image: mmieczkowski/serverguard-api:latest
+    environment:
+      - SPRING_PROFILES_ACTIVE=production
     ports:
     - "8080:8080"
     restart: always
