@@ -33,11 +33,19 @@ internal sealed class CollectMetricsJob : BackgroundService
         while (!cancellationToken.IsCancellationRequested)
         {
             _logger.LogInformation("Collecting metrics...");
-            var agentConfig = await _agentConfigProvider.GetAsync(cancellationToken);
-            var metrics = await _metricCollector.CollectAsync();
-            await _integrationApi.SendMetrics(_configuration.GetValue<string>("ApiKey")!, agentConfig.ResourceGroupId, agentConfig.AgentId, metrics, cancellationToken);
-            _logger.LogInformation("Metrics collected");
-            await Task.Delay(TimeSpan.FromSeconds(agentConfig.CollectEverySeconds), cancellationToken);
+            try
+            {
+                var agentConfig = await _agentConfigProvider.GetAsync(cancellationToken);
+                var metrics = await _metricCollector.CollectAsync();
+                await _integrationApi.SendMetrics(_configuration.GetValue<string>("ApiKey")!, agentConfig.ResourceGroupId, agentConfig.AgentId, metrics, cancellationToken);
+                _logger.LogInformation("Metrics collected");
+                await Task.Delay(TimeSpan.FromSeconds(agentConfig.CollectEverySeconds), cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error collecting metrics. Next attempt in 5 seconds...");
+                await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
+            }
         }
     }
 }
