@@ -8,5 +8,5 @@ web:
   url: http://serverguard.tech
 
 rsa:
-  private-key: optional:/secrets/private.pem
-  public-key: optional:/secrets/public.pem
+  private-key: optional:file:/secrets/private.pem
+  public-key: optional:file:/secrets/public.pem
