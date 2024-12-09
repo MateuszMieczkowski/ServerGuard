@@ -21,7 +21,7 @@ jobs:
         run: echo "${{ secrets.SPRING_SECRETS }}" >> ./secrets/secrets.yml
 
       - name: Copy spring secrets to hetzner VM
-        run: scp -o StrictHostKeyChecking=no -i ./ssh_key ./secrets/secrets.yml ${{ secrets.HETZNER_USER }}@${{ secrets.HETZNER_IP }}:/${{ secrets.HETZNER_USER }}/deploy/secrets/
+        run: scp -o StrictHostKeyChecking=no -i ./ssh_key ./secrets/secrets.yml ${{ secrets.HETZNER_USER }}@${{ secrets.HETZNER_IP }}:/${{ secrets.HETZNER_USER }}/deploy/volumes/serverguard-api-secrets/
 
       - name: Create pritvate cert file - private.pem
         run: echo "${{ secrets.JWT_PRIVATE_CERT }}" >> ./secrets/private.pem
@@ -30,10 +30,10 @@ jobs:
         run: echo "${{ secrets.JWT_PUBLIC_CERT }}" >> ./secrets/public.pem
 
       - name: Copy pritvate cert file to hetzner VM
-        run: scp -o StrictHostKeyChecking=no -i ./ssh_key ./secrets/private.pem ${{ secrets.HETZNER_USER }}@${{ secrets.HETZNER_IP }}:/${{ secrets.HETZNER_USER }}/deploy/secrets/
+        run: scp -o StrictHostKeyChecking=no -i ./ssh_key ./secrets/private.pem ${{ secrets.HETZNER_USER }}@${{ secrets.HETZNER_IP }}:/${{ secrets.HETZNER_USER }}/deploy/volumes/serverguard-api-secrets/
 
       - name: Copy public cert file to hetzner VM
-        run: scp -o StrictHostKeyChecking=no -i ./ssh_key ./secrets/public.pem ${{ secrets.HETZNER_USER }}@${{ secrets.HETZNER_IP }}:/${{ secrets.HETZNER_USER }}/deploy/secrets/
+        run: scp -o StrictHostKeyChecking=no -i ./ssh_key ./secrets/public.pem ${{ secrets.HETZNER_USER }}@${{ secrets.HETZNER_IP }}:/${{ secrets.HETZNER_USER }}/deploy/volumes/serverguard-api-secrets/
 
       - name: Copy docker compose file to hetzner VM
         run: scp -o StrictHostKeyChecking=no -i ./ssh_key ./docker-compose.yml ${{ secrets.HETZNER_USER }}@${{ secrets.HETZNER_IP }}:/${{ secrets.HETZNER_USER }}/deploy/
