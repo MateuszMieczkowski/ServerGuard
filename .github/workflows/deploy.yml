@@ -1,9 +1,6 @@
 name: ServerGuard deploy
 
-on:
-  workflow_run:
-    workflows: ["ServerGuard Api build", "ServerGuard Web build"]
-    types: ["completed"]
+on: workflow_dispatch
 
 jobs:
   deploy:
