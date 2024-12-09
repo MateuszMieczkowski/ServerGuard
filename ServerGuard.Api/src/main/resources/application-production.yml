@@ -2,11 +2,11 @@ spring:
   devtools:
     add-properties: false
   config:
-    import: optional:/secrets/secrets.yml
+    import: file:/secrets/secrets.yml
 
 web:
   url: http://serverguard.tech
 
 rsa:
-  private-key: optional:file:/secrets/private.pem
-  public-key: optional:file:/secrets/public.pem
+  private-key: file:/secrets/private.pem
+  public-key: file:/secrets/public.pem
