@@ -17,6 +17,9 @@ jobs:
       - name: Set permission to ssh key
         run: chmod 400 ssh_key
 
+      - name: Create secrets directory
+        run: mkdir ./secrets
+
       - name: Create spring secrets file- secrets.yml
         run: echo "${{ secrets.SPRING_SECRETS }}" >> ./secrets/secrets.yml
 
