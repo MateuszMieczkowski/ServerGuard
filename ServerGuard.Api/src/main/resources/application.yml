@@ -24,7 +24,7 @@ logging:
   level:
     clickhouse: DEBUG
   file:
-    name: /var/log/serverguard/serverguard-api.log
+    name: ./logs/serverguard-api.log
   logback:
     rollingpolicy:
       file-name-pattern: ${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz
