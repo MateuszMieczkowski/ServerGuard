@@ -6,7 +6,7 @@ services:
     ports:
     - "8080:8080"
     volumes:
-      - ./volumes/serverguard-api-logs:./logs/
+      - ./volumes/serverguard-api-logs:/logs/
     restart: always
 
   serverguard.web:
