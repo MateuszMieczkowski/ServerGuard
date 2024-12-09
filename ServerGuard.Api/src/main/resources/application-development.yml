@@ -21,3 +21,7 @@ springdoc:
   api-docs:
     enabled: true
     path: /swagger-ui.html
+
+rsa:
+  private-key: classpath:certs/private.pem
+  public-key: classpath:certs/public.pem
