@@ -21,6 +21,8 @@ import AnnouncementOutlinedIcon from "@mui/icons-material/AnnouncementOutlined";
 import MoreVertOutlinedIcon from "@mui/icons-material/MoreVertOutlined";
 import dayjs from "dayjs";
 import { UpdateAgentDialog } from "../components/update-agent-dialog";
+import DownloadIcon from "@mui/icons-material/Download";
+import DownloadAgentDialog from "../components/download-agent-dialog";
 
 const AgentsPage = () => {
   const { resourceGroupId } = useParams();
@@ -37,6 +39,7 @@ const AgentsPage = () => {
   const [getAgentsResponse, setGetAgentsResponse] =
     useState<GetAgentsResponse | null>(null);
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
+  const [openDownloadAgentDialog, setOpenDownloadAgentDialog] = useState(false);
   useEffect(() => {
     getResourceGroup(resourceGroupId as string).then((response) => {
       setResourceGroup(response);
@@ -73,6 +76,9 @@ const AgentsPage = () => {
         >
           Create
         </Button>
+        <IconButton onClick={() => setOpenDownloadAgentDialog(true)}>
+          <DownloadIcon />
+        </IconButton>
       </Stack>
       <Grid
         container
@@ -159,6 +165,10 @@ const AgentsPage = () => {
           agentId={selectedAgentId}
         ></UpdateAgentDialog>
       )}
+      <DownloadAgentDialog
+        open={openDownloadAgentDialog}
+        setOpen={setOpenDownloadAgentDialog}
+      ></DownloadAgentDialog>
     </Container>
   );
 };
