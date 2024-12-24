@@ -4,7 +4,6 @@ import com.mmieczkowski.serverguard.resourcegroup.model.UserResourceGroupPermiss
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Clock;
 import java.util.Collection;
@@ -26,7 +25,7 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+    @OneToMany(mappedBy = "user")
     private List<UserResourceGroupPermission> permissions;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")

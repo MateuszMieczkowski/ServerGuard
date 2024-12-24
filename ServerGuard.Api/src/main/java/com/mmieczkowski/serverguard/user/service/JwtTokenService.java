@@ -7,6 +7,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.stream.Collectors;
@@ -14,13 +15,15 @@ import java.util.stream.Collectors;
 @Service
 public class JwtTokenService implements AuthTokenService {
     private final JwtEncoder encoder;
+    private final Clock clock;
 
-    public JwtTokenService(JwtEncoder encoder) {
+    public JwtTokenService(JwtEncoder encoder, Clock clock) {
         this.encoder = encoder;
+        this.clock = clock;
     }
 
     public String generateToken(Authentication authentication) {
-        Instant now = Instant.now();
+        Instant now = clock.instant();
         String scope = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));

@@ -14,14 +14,11 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.time.Clock;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 @Component
 public class CheckAlertJob {
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(CheckAlertJob.class);
-    private static final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
 
     private final AlertRepository alertRepository;
     private final MetricRepository metricRepository;
@@ -44,17 +41,30 @@ public class CheckAlertJob {
         this.emailService = emailService;
     }
 
-    @Scheduled(fixedRate = 1, timeUnit = TimeUnit.MINUTES)
-    public void checkAlerts() {
+    @Scheduled(fixedRate = 30, timeUnit = TimeUnit.SECONDS)
+    public void checkAlerts() throws ExecutionException, InterruptedException, TimeoutException {
         log.info("Checking alerts");
         List<Alert> alertToCheck = alertRepository.findAllWhereNextCheckIsNullOrPast();
-        alertToCheck.forEach(alert -> {
-            try {
-                CheckAlert(alert);
-            } catch (Exception e) {
-                log.error("Error checking alert {}", alert.getId(), e);
+        if(alertToCheck.isEmpty()) {
+            log.info("No alerts to check");
+            return;
+        }
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            var futures = new Future[alertToCheck.size()];
+            for (Alert alert : alertToCheck) {
+                Future<?> future = executor.submit(() -> {
+                    try {
+                        CheckAlert(alert);
+                    } catch (Exception e) {
+                        log.error("Error checking alert {}", alert.getId(), e);
+                    }
+                });
+                futures[alertToCheck.indexOf(alert)] = future;
             }
-        });
+            for (Future<?> future : futures) {
+                future.get(3, TimeUnit.SECONDS);
+            }
+        }
     }
 
     private void CheckAlert(Alert alert) {
@@ -62,9 +72,9 @@ public class CheckAlertJob {
         float metricValue = getMetricValue(alert);
         if (alert.check(metricValue, clock)) {
             log.info("Alert {} triggered", alert.getName());
-            var alertLog = new AlertLog(alert, metricValue, clock);
-            alertLogRepository.save(alertLog);
             if (alert.shouldNotify(clock)) {
+                var alertLog = new AlertLog(alert, metricValue, clock);
+                alertLogRepository.save(alertLog);
                 try {
                     sendNotification(alertLog);
                 } catch (Exception e) {
@@ -72,7 +82,6 @@ public class CheckAlertJob {
                 }
                 alert.setNextNotification(clock);
             }
-
         }
         alert.setNextCheck(clock);
         alertRepository.save(alert);
@@ -89,13 +98,11 @@ public class CheckAlertJob {
 
     private void sendNotification(AlertLog alertLog) {
         var recipientEmails = resourceGroupRepository.findAllResourceGroupUserEmails(alertLog.getAgent().getResourceGroup().getId());
-        executorService.submit(() -> {
             try {
                 sendEmail(alertLog, recipientEmails.toArray(new String[0]));
             } catch (MessagingException | IOException e) {
                 log.error("Error sending email for alertLog with id: {}", alertLog.getId(), e);
             }
-        });
     }
 
     private void sendEmail(AlertLog alertLog, String[] emails) throws MessagingException, IOException {

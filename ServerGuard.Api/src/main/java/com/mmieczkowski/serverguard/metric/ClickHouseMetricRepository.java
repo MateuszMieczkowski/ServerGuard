@@ -11,6 +11,7 @@ import com.mmieczkowski.serverguard.metric.model.MetricType;
 import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -46,8 +47,8 @@ public class ClickHouseMetricRepository implements MetricRepository {
     public List<AvailableMetric> findAvailableMetricsByAgentId(UUID agentId) {
         String query = String.format("SELECT * FROM available_metric m WHERE agent_id = '%s'", agentId.toString());
         CompletableFuture<Records> responseCompletableFuture = client.queryRecords(query);
-        try(Records queryResponse = responseCompletableFuture.get(3, TimeUnit.SECONDS)) {
-            if(queryResponse.getResultRows() == 0) {
+        try (Records queryResponse = responseCompletableFuture.get(3, TimeUnit.SECONDS)) {
+            if (queryResponse.getResultRows() == 0) {
                 return Collections.emptyList();
             }
             List<AvailableMetric> availableMetrics = new ArrayList<>();
@@ -96,8 +97,8 @@ public class ClickHouseMetricRepository implements MetricRepository {
         queryParams.put("from", toClickHouseDateTimeFormat(from));
         queryParams.put("to", toClickHouseDateTimeFormat(to));
         CompletableFuture<QueryResponse> responseCompletableFuture = client.query(query, queryParams, new QuerySettings());
-        try(QueryResponse queryResponse = responseCompletableFuture.get(3, TimeUnit.SECONDS)) {
-            if(queryResponse.getResultRows() == 0) {
+        try (QueryResponse queryResponse = responseCompletableFuture.get(3, TimeUnit.SECONDS)) {
+            if (queryResponse.getResultRows() == 0) {
                 return Collections.emptyList();
             }
             ClickHouseBinaryFormatReader reader = Client.newBinaryFormatReader(queryResponse);
@@ -116,12 +117,12 @@ public class ClickHouseMetricRepository implements MetricRepository {
 
     @Override
     public List<DataPoint> findAvgMetricsByAgentId(UUID agentId,
-                                                String sensorName,
-                                                String metricName,
-                                                MetricType metricType,
-                                                LocalDateTime from,
-                                                LocalDateTime to,
-                                                int intervalMinutes) {
+                                                   String sensorName,
+                                                   String metricName,
+                                                   MetricType metricType,
+                                                   LocalDateTime from,
+                                                   LocalDateTime to,
+                                                   int intervalMinutes) {
         String query =
                 """
                         SELECT toStartOfInterval(time, INTERVAL {intervalMinutes:Int32} minute) AS interval,
@@ -144,8 +145,8 @@ public class ClickHouseMetricRepository implements MetricRepository {
         queryParams.put("from", toClickHouseDateTimeFormat(from));
         queryParams.put("to", toClickHouseDateTimeFormat(to));
         CompletableFuture<QueryResponse> responseCompletableFuture = client.query(query, queryParams, new QuerySettings());
-        try(QueryResponse queryResponse = responseCompletableFuture.get(3, TimeUnit.SECONDS)) {
-            if(queryResponse.getResultRows() == 0) {
+        try (QueryResponse queryResponse = responseCompletableFuture.get(3, TimeUnit.SECONDS)) {
+            if (queryResponse.getResultRows() == 0) {
                 return Collections.emptyList();
             }
             ClickHouseBinaryFormatReader reader = Client.newBinaryFormatReader(queryResponse);
@@ -164,11 +165,11 @@ public class ClickHouseMetricRepository implements MetricRepository {
 
     @Override
     public double findLastMetricValueByAgentId(UUID agentId,
-                                              String sensorName,
-                                              String metricName,
-                                              MetricType metricType,
-                                              Duration fromNow,
-                                              String aggregateFunction) {
+                                               String sensorName,
+                                               String metricName,
+                                               MetricType metricType,
+                                               Duration fromNow,
+                                               String aggregateFunction) {
         String query = """
                 select toFloat64(%s(m.value)) from metric m
                 where m.agent_id = {agentId:String}
@@ -185,8 +186,8 @@ public class ClickHouseMetricRepository implements MetricRepository {
         queryParams.put("metricName", metricName);
         queryParams.put("metricType", metricType.getValue());
         CompletableFuture<QueryResponse> responseCompletableFuture = client.query(query, queryParams, new QuerySettings());
-        try(QueryResponse queryResponse = responseCompletableFuture.get(3, TimeUnit.SECONDS)) {
-            if(queryResponse.getResultRows() == 0) {
+        try (QueryResponse queryResponse = responseCompletableFuture.get(3, TimeUnit.SECONDS)) {
+            if (queryResponse.getResultRows() == 0) {
                 return 0;
             }
             ClickHouseBinaryFormatReader reader = Client.newBinaryFormatReader(queryResponse);
