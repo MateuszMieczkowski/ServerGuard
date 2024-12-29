@@ -6,13 +6,12 @@ spring:
     password: mysecretpassword
   devtools:
     add-properties: true
-  config:
-    import: optional:secrets.yml
 
 clickhouse:
   password: mysecretpassword
   username: default
   url: http://localhost:8123/default
+  jdbc-url: jdbc:clickhouse://localhost:8123/default
 
 web:
   url: http://localhost:5173
@@ -23,5 +22,11 @@ springdoc:
     path: /swagger-ui.html
 
 rsa:
-  private-key: classpath:certs/private.pem
-  public-key: classpath:certs/public.pem
+  private-key: classpath:certs/development-private.pem
+  public-key: classpath:certs/development-public.pem
+
+smtp:
+  host: smtp.zoho.eu
+  port: 587
+  username: serverguard@zohomail.eu
+  password: XXX

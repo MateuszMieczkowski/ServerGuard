@@ -26,10 +26,9 @@ import java.util.Properties;
 @EnableConfigurationProperties({ ClickHouseProperties.class, SmtpProperties.class, WebProperties.class })
 public class Config {
 
-    @SuppressWarnings("deprecation")
     @Bean
     @Profile({"production", "development"})
-    public Client chDirectClient(ClickHouseProperties properties) {
+    public Client clickHouseClient(ClickHouseProperties properties) {
         return new Client.Builder()
                 .addEndpoint(properties.url())
                 .setUsername(properties.username())
@@ -40,7 +39,6 @@ public class Config {
                 .setSocketTcpNodelay(true)
                 .setSocketSndbuf(500_000)
                 .setClientNetworkBufferSize(500_000)
-                .useNewImplementation(true)
                 .build();
     }
 

@@ -8,7 +8,6 @@ import com.clickhouse.client.api.query.Records;
 import com.mmieczkowski.serverguard.metric.model.AvailableMetric;
 import com.mmieczkowski.serverguard.metric.model.Metric;
 import com.mmieczkowski.serverguard.metric.model.MetricType;
-import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
@@ -27,15 +26,6 @@ public class ClickHouseMetricRepository implements MetricRepository {
 
     public ClickHouseMetricRepository(Client client) {
         this.client = client;
-    }
-
-    @PostConstruct
-    public void setup() {
-        client.ping();
-        var metricSchema = client.getTableSchema("metric");
-        var availableMetricSchema = client.getTableSchema("available_metric");
-        client.register(Metric.class, metricSchema);
-        client.register(AvailableMetric.class, availableMetricSchema);
     }
 
     @Override

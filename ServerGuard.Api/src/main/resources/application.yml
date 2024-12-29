@@ -3,10 +3,10 @@ spring:
     name: ServerGuard
   jpa:
     show-sql: true
-    hibernate:
-      ddl-auto: update
     properties:
       hibernate.hibernate.format_sql: true
+    hibernate:
+      ddl-auto: none
   jackson:
     mapper:
       accept-case-insensitive-enums: true
@@ -15,12 +15,15 @@ spring:
       enabled: true
   profiles:
     active: development
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
 
 logging:
   level:
     clickhouse: DEBUG
   file:
-    name: /logs/serverguard-api.log
+    name: ./logs/serverguard-api.log
   logback:
     rollingpolicy:
       file-name-pattern: ${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz
