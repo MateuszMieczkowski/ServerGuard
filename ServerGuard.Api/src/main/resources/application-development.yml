@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://serverguard.postgres:5432/postgres
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: mysecretpassword
@@ -10,8 +10,8 @@ spring:
 clickhouse:
   password: mysecretpassword
   username: default
-  url: http://localhost:8123/default
-  jdbc-url: jdbc:clickhouse://localhost:8123/default
+  url: http://serverguard.clickhouse:8123/default
+  jdbc-url: jdbc:clickhouse://serverguard.clickhouse:8123/default
 
 web:
   url: http://localhost:5173
