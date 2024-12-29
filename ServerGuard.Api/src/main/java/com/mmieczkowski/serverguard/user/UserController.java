@@ -12,8 +12,6 @@ import com.mmieczkowski.serverguard.user.service.UserService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 @RestController
 @RequestMapping("api/users")
 public class UserController {

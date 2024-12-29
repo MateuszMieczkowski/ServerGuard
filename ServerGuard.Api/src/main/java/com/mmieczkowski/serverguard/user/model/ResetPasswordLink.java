@@ -1,7 +1,6 @@
 package com.mmieczkowski.serverguard.user.model;
 
 import com.mmieczkowski.serverguard.service.SecureRandomString;
-import io.swagger.v3.oas.models.info.Contact;
 import jakarta.persistence.*;
 import org.hibernate.annotations.SQLRestriction;
 

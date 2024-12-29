@@ -2,9 +2,6 @@ package com.mmieczkowski.serverguard.resourcegroup.model;
 
 import com.mmieczkowski.serverguard.user.model.User;
 import jakarta.persistence.*;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
-import org.hibernate.annotations.SoftDelete;
 import org.springframework.security.core.GrantedAuthority;
 
 @Entity

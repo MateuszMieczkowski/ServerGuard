@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 @Embeddable
 public class AgentConfig implements Serializable {
@@ -102,9 +103,8 @@ public class AgentConfig implements Serializable {
 
     public boolean equals(final Object o) {
         if (o == this) return true;
-        if (!(o instanceof AgentConfig)) return false;
-        final AgentConfig other = (AgentConfig) o;
-        if (!other.canEqual((Object) this)) return false;
+        if (!(o instanceof AgentConfig other)) return false;
+        if (!other.canEqual(this)) return false;
         if (this.isCpuEnabled() != other.isCpuEnabled()) return false;
         if (this.isGpuEnabled() != other.isGpuEnabled()) return false;
         if (this.isMemoryEnabled() != other.isMemoryEnabled()) return false;
@@ -115,8 +115,7 @@ public class AgentConfig implements Serializable {
         if (this.getCollectEverySeconds() != other.getCollectEverySeconds()) return false;
         final Object this$apiKey = this.getApiKey();
         final Object other$apiKey = other.getApiKey();
-        if (this$apiKey == null ? other$apiKey != null : !this$apiKey.equals(other$apiKey)) return false;
-        return true;
+        return Objects.equals(this$apiKey, other$apiKey);
     }
 
     protected boolean canEqual(final Object other) {

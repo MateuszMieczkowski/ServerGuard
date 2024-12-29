@@ -3,7 +3,6 @@ package com.mmieczkowski.serverguard.resourcegroup.model;
 import com.mmieczkowski.serverguard.resourcegroup.exception.ResourceGroupInvitationNotFoundException;
 import com.mmieczkowski.serverguard.user.model.User;
 import jakarta.persistence.*;
-import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -16,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)

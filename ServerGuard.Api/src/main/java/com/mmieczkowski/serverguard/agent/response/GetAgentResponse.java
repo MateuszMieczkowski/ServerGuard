@@ -19,23 +19,23 @@ public record GetAgentResponse(UUID id, String name, AgentConfig config, Instant
             this.apiKey = agentConfig.getApiKey();
         }
 
-        private boolean isCpuEnabled;
+        private final boolean isCpuEnabled;
 
-        private boolean isGpuEnabled;
+        private final boolean isGpuEnabled;
 
-        private boolean isMemoryEnabled;
+        private final boolean isMemoryEnabled;
 
-        private boolean isMotherboardEnabled;
+        private final boolean isMotherboardEnabled;
 
-        private boolean isControllerEnabled;
+        private final boolean isControllerEnabled;
 
-        private boolean isNetworkEnabled;
+        private final boolean isNetworkEnabled;
 
-        private boolean isStorageEnabled;
+        private final boolean isStorageEnabled;
 
-        private int collectEverySeconds;
+        private final int collectEverySeconds;
 
-        private String apiKey;
+        private final String apiKey;
 
         public boolean isCpuEnabled() {
             return this.isCpuEnabled;
@@ -75,9 +75,8 @@ public record GetAgentResponse(UUID id, String name, AgentConfig config, Instant
 
         public boolean equals(final Object o) {
             if (o == this) return true;
-            if (!(o instanceof AgentConfig)) return false;
-            final AgentConfig other = (AgentConfig) o;
-            if (!other.canEqual((Object) this)) return false;
+            if (!(o instanceof AgentConfig other)) return false;
+            if (!other.canEqual(this)) return false;
             if (this.isCpuEnabled() != other.isCpuEnabled()) return false;
             if (this.isGpuEnabled() != other.isGpuEnabled()) return false;
             if (this.isMemoryEnabled() != other.isMemoryEnabled()) return false;
@@ -88,8 +87,7 @@ public record GetAgentResponse(UUID id, String name, AgentConfig config, Instant
             if (this.getCollectEverySeconds() != other.getCollectEverySeconds()) return false;
             final Object this$apiKey = this.getApiKey();
             final Object other$apiKey = other.getApiKey();
-            if (!Objects.equals(this$apiKey, other$apiKey)) return false;
-            return true;
+            return Objects.equals(this$apiKey, other$apiKey);
         }
 
         protected boolean canEqual(final Object other) {

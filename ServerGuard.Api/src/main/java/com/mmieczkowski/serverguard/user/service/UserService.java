@@ -1,7 +1,6 @@
 package com.mmieczkowski.serverguard.user.service;
 
 import com.mmieczkowski.serverguard.service.CurrentUserService;
-import com.mmieczkowski.serverguard.user.UserNotFoundException;
 import com.mmieczkowski.serverguard.user.repository.UserRepository;
 import com.mmieczkowski.serverguard.user.request.LoginRequest;
 import com.mmieczkowski.serverguard.user.response.LoginResponse;
@@ -16,9 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.time.Clock;
-import java.util.UUID;
 
 @Service
 public class UserService {
