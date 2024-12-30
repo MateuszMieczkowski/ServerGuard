@@ -142,10 +142,10 @@ const SignIn = () => {
                   to="/forgot-password"
                   variant="body2"
                 >
-                  Forgot password?
+                  Forgot password
                 </Link>
                 <Link component={RouterLink} to="/sign-up" variant="body2">
-                  {"Don't have an account? Sign Up"}
+                  {"Sign Up"}
                 </Link>
               </Box>
             </Box>
