@@ -39,6 +39,7 @@ public class Config {
                 .setSocketTcpNodelay(true)
                 .setSocketSndbuf(500_000)
                 .setClientNetworkBufferSize(500_000)
+                .useNewImplementation(true)
                 .build();
     }
 
