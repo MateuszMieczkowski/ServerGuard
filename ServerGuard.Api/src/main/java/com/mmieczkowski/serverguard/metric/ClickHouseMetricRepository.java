@@ -87,7 +87,7 @@ public class ClickHouseMetricRepository implements MetricRepository {
         queryParams.put("from", toClickHouseDateTimeFormat(from));
         queryParams.put("to", toClickHouseDateTimeFormat(to));
         CompletableFuture<QueryResponse> responseCompletableFuture = client.query(query, queryParams, new QuerySettings());
-        try (QueryResponse queryResponse = responseCompletableFuture.get(3, TimeUnit.SECONDS)) {
+        try (QueryResponse queryResponse = responseCompletableFuture.get(10, TimeUnit.SECONDS)) {
             if (queryResponse.getResultRows() == 0) {
                 return Collections.emptyList();
             }
@@ -135,7 +135,7 @@ public class ClickHouseMetricRepository implements MetricRepository {
         queryParams.put("from", toClickHouseDateTimeFormat(from));
         queryParams.put("to", toClickHouseDateTimeFormat(to));
         CompletableFuture<QueryResponse> responseCompletableFuture = client.query(query, queryParams, new QuerySettings());
-        try (QueryResponse queryResponse = responseCompletableFuture.get(3, TimeUnit.SECONDS)) {
+        try (QueryResponse queryResponse = responseCompletableFuture.get(10, TimeUnit.SECONDS)) {
             if (queryResponse.getResultRows() == 0) {
                 return Collections.emptyList();
             }
