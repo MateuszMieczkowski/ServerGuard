@@ -16,6 +16,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.time.Clock;
+import java.time.temporal.ChronoUnit;
 import java.util.Properties;
 
 @Configuration
@@ -40,6 +41,7 @@ public class Config {
                 .setSocketSndbuf(500_000)
                 .setClientNetworkBufferSize(500_000)
                 .useNewImplementation(true)
+                .setSocketTimeout(10, ChronoUnit.SECONDS)
                 .build();
     }
 
