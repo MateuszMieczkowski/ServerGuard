@@ -1,12 +1,12 @@
 package com.mmieczkowski.serverguard.user.service;
 
 import com.mmieczkowski.serverguard.service.CurrentUserService;
+import com.mmieczkowski.serverguard.user.model.User;
 import com.mmieczkowski.serverguard.user.repository.UserRepository;
 import com.mmieczkowski.serverguard.user.request.LoginRequest;
-import com.mmieczkowski.serverguard.user.response.LoginResponse;
 import com.mmieczkowski.serverguard.user.request.RegisterRequest;
+import com.mmieczkowski.serverguard.user.response.LoginResponse;
 import com.mmieczkowski.serverguard.user.response.RegisterResponse;
-import com.mmieczkowski.serverguard.user.model.User;
 import com.mmieczkowski.serverguard.user.response.UserProfileResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
@@ -44,6 +45,7 @@ public class UserService {
         return new LoginResponse(token);
     }
 
+    @Transactional
     public RegisterResponse register(RegisterRequest registerRequest) {
         UserDetails userDetails = org.springframework.security.core.userdetails.User.withUsername(registerRequest.email())
                 .password(registerRequest.password())
@@ -62,6 +64,6 @@ public class UserService {
     public UserProfileResponse getUserProfile() {
         User user = currentUserService.getLoggedInUser().orElseThrow();
         return new UserProfileResponse(user.getId(), user.getUsername(), user.getPermissions()
-                .map(x -> new UserProfileResponse.ResourceGroupPermission(x.getId().getResourceGroupId(), x.getRole()) ).toList());
+                .map(x -> new UserProfileResponse.ResourceGroupPermission(x.getId().getResourceGroupId(), x.getRole())).toList());
     }
 }

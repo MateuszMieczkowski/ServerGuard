@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Clock;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -26,10 +27,10 @@ public class User implements UserDetails {
     private String password;
 
     @OneToMany(mappedBy = "user")
-    private List<UserResourceGroupPermission> permissions;
+    private final List<UserResourceGroupPermission> permissions = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    private List<ResetPasswordLink> resetPasswordLinks;
+    private final List<ResetPasswordLink> resetPasswordLinks = new ArrayList<>();
 
     public User() {
     }
@@ -52,11 +53,6 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return email;
-    }
-
-    public boolean hasAccessToResourceGroup(UUID resourceGroupId) {
-        return permissions.stream()
-                .anyMatch(permission -> permission.getResourceGroup().getId().equals(resourceGroupId));
     }
 
     public UUID getId() {

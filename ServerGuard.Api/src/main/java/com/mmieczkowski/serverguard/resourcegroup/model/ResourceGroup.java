@@ -49,12 +49,12 @@ public class ResourceGroup {
     }
 
     public ResourceGroup(String name) {
+        Assert.hasText(name, "Name cannot be null or empty");
         this.name = name;
     }
 
     public void setName(String name) {
-        Assert.notNull(name, "Name cannot be null");
-        Assert.isTrue(!name.isBlank(), "Name cannot be blank");
+        Assert.hasText(name, "Name cannot be null or empty");
         this.name = name;
     }
 
@@ -66,17 +66,17 @@ public class ResourceGroup {
         return this.name;
     }
 
-    public ResourceGroupInvitation createInvitation(String email, ResourceGroupUserRole role, Clock clock)
-    {
+    public ResourceGroupInvitation createInvitation(String email, ResourceGroupUserRole role, Clock clock) {
         ResourceGroupInvitation invitation = new ResourceGroupInvitation(email, role, clock);
         this.resourceGroupInvitations.add(invitation);
         return invitation;
     }
 
-    public void acceptInvitation(String token, User user, Clock clock){
-        if(user.hasAccessToResourceGroup(this.id)){
+    public void acceptInvitation(String token, User user, Clock clock) {
+        if (userResourceGroupPermissions.stream().anyMatch(x -> x.getUser().equals(user))) {
             return;
         }
+
         Optional<ResourceGroupInvitation> optionalResourceGroupInvitation = resourceGroupInvitations.stream()
                 .filter(invitation -> invitation.getToken().equals(token))
                 .findFirst();
@@ -107,5 +107,10 @@ public class ResourceGroup {
     public void delete() {
         this.isDeleted = true;
         userResourceGroupPermissions.clear();
+    }
+
+    public boolean hasPermission(User user, ResourceGroupUserRole role) {
+        return userResourceGroupPermissions.stream()
+                .anyMatch(x -> x.getUser().equals(user) && x.getRole().equals(role));
     }
 }
