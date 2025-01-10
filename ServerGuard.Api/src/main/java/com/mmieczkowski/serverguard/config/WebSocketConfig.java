@@ -16,8 +16,8 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -47,9 +47,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             public Message<?> preSend(@NotNull Message<?> message, @NotNull MessageChannel channel) {
                 StompHeaderAccessor accessor =
                         MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+                if (accessor == null) {
+                    throw new InsufficientAuthenticationException("Missing JWT token");
+                }
                 if (StompCommand.CONNECT.equals(accessor.getCommand())) {
                     String jwtToken = accessor.getFirstNativeHeader("Authorization");
-                    if(jwtToken == null) {
+                    if (jwtToken == null) {
                         throw new InsufficientAuthenticationException("Missing JWT token");
                     }
                     Jwt jwt = jwtDecoder.decode(jwtToken);
