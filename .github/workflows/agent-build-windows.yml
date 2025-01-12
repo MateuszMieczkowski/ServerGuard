@@ -1,6 +1,7 @@
 name: Serverguard Agent build windows
 
 on:
+  workflow_dispatch:
   push:
     branches: ["master"]
     paths: ["ServerGuard.Agent/**"]

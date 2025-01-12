@@ -1,6 +1,7 @@
 name: ServerGuard Web build
 
 on:
+  workflow_dispatch:
   push:
     branches: ["master"]
     paths: ["ServerGuard.Web/**"]
