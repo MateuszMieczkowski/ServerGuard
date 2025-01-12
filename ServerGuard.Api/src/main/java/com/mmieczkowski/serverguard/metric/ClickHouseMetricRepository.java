@@ -149,6 +149,7 @@ public class ClickHouseMetricRepository implements MetricRepository {
             return dataPoints;
 
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
