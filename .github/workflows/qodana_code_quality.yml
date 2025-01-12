@@ -24,7 +24,7 @@ jobs:
         with:
           pr-mode: false
           args: |
-            --source-directory,ServerGuard.Api,--config,qodana-api.yaml
+            --project-dir,ServerGuard.Api,--config,qodana-api.yaml
           artifact-name: qodana-api
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_2049532841 }}
