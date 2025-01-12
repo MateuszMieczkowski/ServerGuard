@@ -2,6 +2,7 @@ package com.mmieczkowski.serverguard.unit;
 
 
 import com.mmieczkowski.serverguard.resourcegroup.exception.ResourceGroupInvitationNotFoundException;
+import com.mmieczkowski.serverguard.resourcegroup.exception.UserAlreadyInResourceGroupException;
 import com.mmieczkowski.serverguard.resourcegroup.model.ResourceGroup;
 import com.mmieczkowski.serverguard.resourcegroup.model.ResourceGroupInvitation;
 import com.mmieczkowski.serverguard.resourcegroup.model.ResourceGroupUserRole;
@@ -9,22 +10,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.User;
 
 import java.time.Clock;
-import java.time.Instant;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 @ExtendWith(MockitoExtension.class)
 public class ResourceGroupTests {
-
-    @Mock
-    private Clock clock;
 
     @Test
     void whenInitializingWithCtor_thenNameIsSet() {
@@ -74,60 +69,50 @@ public class ResourceGroupTests {
 
     @Test
     void whenCreatingInvitation_thenInvitationHasCorrectEmail() {
-        Instant instant = Instant.now();
-        Mockito.when(clock.instant()).thenReturn(instant);
         ResourceGroup resourceGroup = new ResourceGroup("Test Resource Group");
         var email = "test@email.com";
 
-        ResourceGroupInvitation invitation = resourceGroup.createInvitation(email, ResourceGroupUserRole.USER, clock);
+        ResourceGroupInvitation invitation = resourceGroup.createInvitation(email, ResourceGroupUserRole.USER, Clock.systemUTC());
 
         assertThat(invitation.getEmail()).isEqualTo(email);
     }
 
     @Test
     void whenCreatingInvitation_thenInvitationTokenSet() {
-        Instant instant = Instant.now();
-        Mockito.when(clock.instant()).thenReturn(instant);
         ResourceGroup resourceGroup = new ResourceGroup("Test Resource Group");
         var email = "test@email.com";
 
-        ResourceGroupInvitation invitation = resourceGroup.createInvitation(email, ResourceGroupUserRole.USER, clock);
+        ResourceGroupInvitation invitation = resourceGroup.createInvitation(email, ResourceGroupUserRole.USER, Clock.systemUTC());
 
         assertThat(invitation.getToken()).isNotBlank();
     }
 
     @Test
     void whenCreatingAdminInvitation_thenInvitationHasAdminRole() {
-        Instant instant = Instant.now();
-        Mockito.when(clock.instant()).thenReturn(instant);
         ResourceGroup resourceGroup = new ResourceGroup("Test Resource Group");
         var email = "test@email.com";
 
-        ResourceGroupInvitation invitation = resourceGroup.createInvitation(email, ResourceGroupUserRole.ADMIN, clock);
+        ResourceGroupInvitation invitation = resourceGroup.createInvitation(email, ResourceGroupUserRole.ADMIN, Clock.systemUTC());
 
         assertThat(invitation.getRole()).isEqualTo(ResourceGroupUserRole.ADMIN);
     }
 
     @Test
     void whenCreatingUserInvitation_thenInvitationHasUserRole() {
-        Instant instant = Instant.now();
-        Mockito.when(clock.instant()).thenReturn(instant);
         ResourceGroup resourceGroup = new ResourceGroup("Test Resource Group");
         var email = "test@email.com";
 
-        ResourceGroupInvitation invitation = resourceGroup.createInvitation(email, ResourceGroupUserRole.USER, clock);
+        ResourceGroupInvitation invitation = resourceGroup.createInvitation(email, ResourceGroupUserRole.USER, Clock.systemUTC());
 
         assertThat(invitation.getRole()).isEqualTo(ResourceGroupUserRole.USER);
     }
 
     @Test
     void whenCreatingInvitation_thenInvitationHasCorrectLink() {
-        Instant instant = Instant.now();
-        Mockito.when(clock.instant()).thenReturn(instant);
         ResourceGroup resourceGroup = new ResourceGroup("Test Resource Group");
         var email = "test@email.com";
 
-        ResourceGroupInvitation invitation = resourceGroup.createInvitation(email, ResourceGroupUserRole.USER, clock);
+        ResourceGroupInvitation invitation = resourceGroup.createInvitation(email, ResourceGroupUserRole.USER, Clock.systemUTC());
 
         assertThat(invitation.constructLink("http://localhost:8080"))
                 .isEqualTo("http://localhost:8080/accept-invitation?token=" + invitation.getToken());
@@ -139,20 +124,91 @@ public class ResourceGroupTests {
         var userDetails = User.builder().username("test@test.com").password("test").build();
         var user = new com.mmieczkowski.serverguard.user.model.User(userDetails);
 
-        assertThatThrownBy(() -> resourceGroup.acceptInvitation("invalid-token", user, clock))
+        assertThatThrownBy(() -> resourceGroup.acceptInvitation("invalid-token", user, Clock.systemUTC()))
                 .isInstanceOf(ResourceGroupInvitationNotFoundException.class);
     }
 
     @Test
     void whenAcceptingInvitation_withValidToken_thenUserAdded() {
-        Instant instant = Instant.now();
-        Mockito.when(clock.instant()).thenReturn(instant);
         ResourceGroup resourceGroup = new ResourceGroup("Test Resource Group");
         var userDetails = User.builder().username("test@test.com").password("test").build();
         var user = new com.mmieczkowski.serverguard.user.model.User(userDetails);
-        var invitation = resourceGroup.createInvitation("test@test.com", ResourceGroupUserRole.USER, clock);
+        var invitation = resourceGroup.createInvitation("test@test.com", ResourceGroupUserRole.USER, Clock.systemUTC());
 
-        resourceGroup.acceptInvitation(invitation.getToken(), user, clock);
-        assertThat(resourceGroup.hasPermission(user, ResourceGroupUserRole.USER)).isTrue();
+        resourceGroup.acceptInvitation(invitation.getToken(), user, Clock.systemUTC());
+        assertThat(resourceGroup.hasUser(user)).isTrue();
     }
+
+    @Test
+    void whenAcceptingInvitation_andUserAlreadyInGroup_thenThrows() {
+        ResourceGroup resourceGroup = new ResourceGroup("Test Resource Group");
+        var userDetails = User.builder().username("test@test.com").password("test").build();
+        var user = new com.mmieczkowski.serverguard.user.model.User(userDetails);
+        resourceGroup.addUser(user, ResourceGroupUserRole.USER);
+        var invitation = resourceGroup.createInvitation("test@test.com", ResourceGroupUserRole.USER, Clock.systemUTC());
+
+        assertThatThrownBy(() -> resourceGroup.acceptInvitation(invitation.getToken(), user, Clock.systemUTC()))
+                .isInstanceOf(UserAlreadyInResourceGroupException.class);
+    }
+
+    @Test
+    void whenGettingInvitation_withInvalidToken_thenThrows() {
+        ResourceGroup resourceGroup = new ResourceGroup("Test Resource Group");
+
+        assertThatThrownBy(() -> resourceGroup.getInvitation("invalid-token"))
+                .isInstanceOf(ResourceGroupInvitationNotFoundException.class);
+    }
+
+    @Test
+    void whenGettingInvitation_withValidToken_thenInvitationReturned() {
+        ResourceGroup resourceGroup = new ResourceGroup("Test Resource Group");
+        var invitation = resourceGroup.createInvitation("test@test.com", ResourceGroupUserRole.USER, Clock.systemUTC());
+
+        assertThat(resourceGroup.getInvitation(invitation.getToken())).isEqualTo(invitation);
+    }
+
+
+    @Test
+    void whenAddingUser_thenUserAdded() {
+        ResourceGroup resourceGroup = new ResourceGroup("Test Resource Group");
+        var userDetails = User.builder().username("test@test.com").password("test").build();
+        var user = new com.mmieczkowski.serverguard.user.model.User(userDetails);
+        resourceGroup.addUser(user, ResourceGroupUserRole.USER);
+        assertThat(resourceGroup.hasUser(user)).isTrue();
+    }
+
+    @Test
+    void whenAddingUser_andUserAlreadyInGroup_thenThrows() {
+        ResourceGroup resourceGroup = new ResourceGroup("Test Resource Group");
+        var userDetails = User.builder().username("test@test.com").password("test").build();
+        var user = new com.mmieczkowski.serverguard.user.model.User(userDetails);
+        resourceGroup.addUser(user, ResourceGroupUserRole.USER);
+
+        assertThatThrownBy(() -> resourceGroup.addUser(user, ResourceGroupUserRole.USER))
+                .isInstanceOf(UserAlreadyInResourceGroupException.class);
+    }
+
+    @Test
+    void whenRemovingUser_thenUserRemoved() {
+        ResourceGroup resourceGroup = new ResourceGroup("Test Resource Group");
+        var userDetails = User.builder().username("test@test.com").password("test").build();
+        var user = new com.mmieczkowski.serverguard.user.model.User(userDetails);
+        resourceGroup.addUser(user, ResourceGroupUserRole.USER);
+
+        resourceGroup.removeUser(user);
+
+        assertThat(resourceGroup.hasUser(user)).isFalse();
+    }
+
+    @Test
+    void whenDeletingResourceGroup_thenPermissionsAreCleared() {
+        ResourceGroup resourceGroup = new ResourceGroup("Test Resource Group");
+        var userDetails = User.builder().username("test@test.com").password("test").build();
+        var user = new com.mmieczkowski.serverguard.user.model.User(userDetails);
+        resourceGroup.addUser(user, ResourceGroupUserRole.USER);
+        resourceGroup.delete();
+
+        assertThat(resourceGroup.hasUser(user)).isFalse();
+    }
+
 }
