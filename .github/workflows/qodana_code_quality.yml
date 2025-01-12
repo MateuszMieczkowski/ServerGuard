@@ -23,7 +23,7 @@ jobs:
         uses: JetBrains/qodana-action@v2024.2
         with:
           pr-mode: false
-          args: "--project-dir, Serverguard.Api"
+          args: "--project-dir, ./Serverguard.Api"
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_2288664 }}
           QODANA_ENDPOINT: "https://qodana.cloud"
