@@ -24,7 +24,7 @@ jobs:
         with:
           pr-mode: false
           args: |
-            --source-directory,ServerGuard.Api,--config,qodana.yaml
+            --source-directory,ServerGuard.Api,--config,qodana-api.yaml
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_2049532841 }}
           QODANA_ENDPOINT: "https://qodana.cloud"
