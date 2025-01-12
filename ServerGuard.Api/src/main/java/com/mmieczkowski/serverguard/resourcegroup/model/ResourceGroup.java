@@ -1,6 +1,7 @@
 package com.mmieczkowski.serverguard.resourcegroup.model;
 
 import com.mmieczkowski.serverguard.resourcegroup.exception.ResourceGroupInvitationNotFoundException;
+import com.mmieczkowski.serverguard.resourcegroup.exception.UserAlreadyInResourceGroupException;
 import com.mmieczkowski.serverguard.user.model.User;
 import jakarta.persistence.*;
 import org.hibernate.annotations.SQLRestriction;
@@ -13,7 +14,6 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Entity
@@ -73,28 +73,25 @@ public class ResourceGroup {
     }
 
     public void acceptInvitation(String token, User user, Clock clock) {
-        if (userResourceGroupPermissions.stream().anyMatch(x -> x.getUser().equals(user))) {
-            return;
-        }
-
-        Optional<ResourceGroupInvitation> optionalResourceGroupInvitation = resourceGroupInvitations.stream()
+        ResourceGroupInvitation resourceGroupInvitation = resourceGroupInvitations.stream()
                 .filter(invitation -> invitation.getToken().equals(token))
-                .findFirst();
-        if (optionalResourceGroupInvitation.isEmpty()) {
-            throw new ResourceGroupInvitationNotFoundException();
-        }
-        ResourceGroupInvitation resourceGroupInvitation = optionalResourceGroupInvitation.get();
+                .findFirst()
+                .orElseThrow(ResourceGroupInvitationNotFoundException::new);
+
         resourceGroupInvitation.accept(clock);
         addUser(user, resourceGroupInvitation.getRole());
     }
 
     public void addUser(User user, ResourceGroupUserRole resourceGroupUserRole) {
+        if (hasUser(user)) {
+            throw new UserAlreadyInResourceGroupException();
+        }
         var userResourceGroupPermission = new UserResourceGroupPermission(this, user, resourceGroupUserRole);
         userResourceGroupPermissions.add(userResourceGroupPermission);
     }
 
-    public void removeUser(UUID userId) {
-        userResourceGroupPermissions.removeIf(x -> x.getUser().getId().equals(userId));
+    public void removeUser(User user) {
+        userResourceGroupPermissions.removeIf(x -> x.getUser().equals(user));
     }
 
     public ResourceGroupInvitation getInvitation(String token) {
@@ -109,8 +106,8 @@ public class ResourceGroup {
         userResourceGroupPermissions.clear();
     }
 
-    public boolean hasPermission(User user, ResourceGroupUserRole role) {
+    public boolean hasUser(User user) {
         return userResourceGroupPermissions.stream()
-                .anyMatch(x -> x.getUser().equals(user) && x.getRole().equals(role));
+                .anyMatch(x -> x.getUser().equals(user));
     }
 }
