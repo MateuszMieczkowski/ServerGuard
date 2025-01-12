@@ -13,12 +13,6 @@ services:
       - serverguard.postgres
       - serverguard.clickhouse
 
-  serverguard.web:
-    image: mmieczkowski/serverguard-web:latest
-    ports:
-    - "80:80"
-    restart: always
-
   serverguard.postgres:
     image: postgres:latest
     ports:
@@ -37,4 +31,10 @@ services:
     environment:
       CLICKHOUSE_PASSWORD: "mysecretpassword"
       CLICKHOUSE_USER: "default"
+    restart: always
+
+  serverguard.web:
+    image: mmieczkowski/serverguard-web:local
+    ports:
+    - "5173:80"
     restart: always
