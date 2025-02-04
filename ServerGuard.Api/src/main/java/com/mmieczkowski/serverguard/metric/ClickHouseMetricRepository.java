@@ -91,7 +91,7 @@ public class ClickHouseMetricRepository implements MetricRepository {
             if (queryResponse.getResultRows() == 0) {
                 return Collections.emptyList();
             }
-            ClickHouseBinaryFormatReader reader = Client.newBinaryFormatReader(queryResponse);
+            ClickHouseBinaryFormatReader reader = client.newBinaryFormatReader(queryResponse);
             List<DataPoint> dataPoints = new ArrayList<>();
             while (reader.hasNext()) {
                 reader.next();
@@ -139,7 +139,7 @@ public class ClickHouseMetricRepository implements MetricRepository {
             if (queryResponse.getResultRows() == 0) {
                 return Collections.emptyList();
             }
-            ClickHouseBinaryFormatReader reader = Client.newBinaryFormatReader(queryResponse);
+            ClickHouseBinaryFormatReader reader = client.newBinaryFormatReader(queryResponse);
             List<DataPoint> dataPoints = new ArrayList<>();
             while (reader.hasNext()) {
                 reader.next();
@@ -180,7 +180,7 @@ public class ClickHouseMetricRepository implements MetricRepository {
             if (queryResponse.getResultRows() == 0) {
                 return 0;
             }
-            ClickHouseBinaryFormatReader reader = Client.newBinaryFormatReader(queryResponse);
+            ClickHouseBinaryFormatReader reader = client.newBinaryFormatReader(queryResponse);
             reader.next();
             return reader.getDouble(1);
 
